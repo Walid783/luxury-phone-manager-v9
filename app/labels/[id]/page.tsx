@@ -1,0 +1,4 @@
+import {notFound} from 'next/navigation'
+import QRCode from 'qrcode'
+import {prisma} from '@/lib/prisma'
+export default async function LabelPage({params}:{params:Promise<{id:string}>}){const {id}=await params;const r=await prisma.repair.findUnique({where:{id},include:{client:true}});if(!r)notFound();const qr=await QRCode.toDataURL(`${process.env.NEXT_PUBLIC_APP_URL||'http://localhost:3000'}/track/${r.trackingToken}`,{margin:0,width:160});return <main className="label-print-page"><section className="repair-label"><div className="label-head"><b>LUXURY <span>PHONE</span></b><strong>#{r.ticketNo}</strong></div><div className="label-main"><div><h1>{r.deviceBrand} {r.deviceModel}</h1><p>{r.client.name}</p><small>{r.imei||r.client.phone}</small></div><img src={qr} alt="QR suivi"/></div><div className="label-issue">{r.issue}</div></section><div className="no-print label-print-actions"><p>Utilisez <b>Ctrl + P</b> pour imprimer cette étiquette.</p></div></main>}

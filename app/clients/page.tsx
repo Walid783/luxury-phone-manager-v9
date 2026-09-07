@@ -1,0 +1,7 @@
+import { redirect } from 'next/navigation'
+import Link from 'next/link'
+import AppShell from '@/components/AppShell'
+import { getSession } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
+import { Search, ChevronRight } from 'lucide-react'
+export default async function Clients({searchParams}:{searchParams:Promise<{q?:string}>}){if(!(await getSession()))redirect('/login');const {q=''}=await searchParams;const rows=await prisma.client.findMany({where:q?{OR:[{name:{contains:q,mode:'insensitive'}},{phone:{contains:q}},{email:{contains:q,mode:'insensitive'}}]}:{},orderBy:{updatedAt:'desc'},include:{_count:{select:{repairs:true}}}});return <AppShell><div className="hero-head compact"><div><div className="eyebrow">CRM</div><h1>Clients</h1><p>Historique, coordonnées et réparations par client.</p></div></div><div className="card"><form className="filters" method="get"><div className="search-box grow"><Search size={17}/><input name="q" defaultValue={q} placeholder="Rechercher un client, téléphone, email…"/></div><button className="btn secondary">Rechercher</button></form><div className="table-wrap"><table><thead><tr><th>Client</th><th>Téléphone</th><th>Email</th><th>Réparations</th><th></th></tr></thead><tbody>{rows.map(c=><tr key={c.id}><td><b>{c.name}</b></td><td>{c.phone}</td><td>{c.email||'—'}</td><td>{c._count.repairs}</td><td><Link className="circle-link" href={`/clients/${c.id}`}><ChevronRight size={18}/></Link></td></tr>)}</tbody></table></div></div></AppShell>}

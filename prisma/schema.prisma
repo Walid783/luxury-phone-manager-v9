@@ -1,0 +1,363 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  TECHNICIAN
+}
+
+enum RepairPriority {
+  BASE
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum RepairPhotoKind {
+  BEFORE
+  AFTER
+}
+
+enum ContactChannel {
+  SMS
+  WHATSAPP
+  EMAIL
+  PHONE
+}
+
+enum DeviceCategory {
+  SMARTPHONE
+  TABLET
+  LAPTOP
+  CONSOLE
+  WATCH
+  OTHER
+}
+
+enum RepairStatus {
+  DIAGNOSTIC
+  WAITING_APPROVAL
+  WAITING_PART
+  REPAIRING
+  READY
+  DELIVERED
+  CANCELLED
+}
+
+enum QuoteStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  REFUSED
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  TRANSFER
+  OTHER
+}
+
+enum EventType {
+  CREATED
+  STATUS
+  NOTE
+  PAYMENT
+  QUOTE
+  PART
+  WARRANTY
+  COMMUNICATION
+  CASH
+}
+
+enum CashSessionStatus {
+  OPEN
+  CLOSED
+}
+
+enum CashMovementType {
+  OPENING
+  SALE
+  REFUND
+  EXPENSE
+  ADJUSTMENT
+  CLOSING
+}
+
+enum WarrantyClaimStatus {
+  OPEN
+  DIAGNOSIS
+  APPROVED
+  REJECTED
+  RESOLVED
+}
+
+enum CommunicationStatus {
+  DRAFT
+  SENT
+  FAILED
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  STATUS_CHANGE
+  PAYMENT
+  PRINT
+  COMMUNICATION
+  CASH_OPEN
+  CASH_CLOSE
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(TECHNICIAN)
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  repairs      Repair[] @relation("AssignedRepairs")
+  events       RepairEvent[]
+  cashSessions CashSession[]
+  auditLogs    AuditLog[]
+}
+
+model Client {
+  id        String   @id @default(cuid())
+  name      String
+  phone     String
+  email     String?
+  notes     String?
+  address   String?
+  postalCode String?
+  city      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  repairs   Repair[]
+  communications CommunicationLog[]
+
+  @@index([phone])
+  @@index([name])
+}
+
+model Repair {
+  id                 String       @id @default(cuid())
+  ticketNo           Int          @unique @default(autoincrement())
+  trackingToken String? @unique
+  clientId           String
+  client             Client       @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  deviceCategory     DeviceCategory @default(SMARTPHONE)
+  deviceBrand        String
+  deviceModel        String
+  deviceColor        String?
+  deviceStorage      String?
+  imei               String?
+  issue              String
+  diagnostic         String?
+  workDone           String?
+  conditionIn        String?
+  accessories        String?
+  lockCode           String?
+  powersOn           Boolean?
+  moistureSuspected  Boolean        @default(false)
+  backupConfirmed    Boolean        @default(false)
+  diagnosticConsent Boolean        @default(true)
+  dataAccessConsent  Boolean        @default(false)
+  notificationChannel ContactChannel @default(SMS)
+  intakeChecklist    String?        @db.Text
+  quoteStatus        QuoteStatus  @default(DRAFT)
+  quoteAmount        Decimal      @default(0) @db.Decimal(10, 2)
+  quoteAcceptedAt    DateTime?
+  promisedAt         DateTime?
+  warrantyDays       Int          @default(90)
+  warrantyUntil      DateTime?
+  status             RepairStatus @default(DIAGNOSTIC)
+  priority           RepairPriority @default(NORMAL)
+  total              Decimal      @default(0) @db.Decimal(10, 2)
+  deposit            Decimal      @default(0) @db.Decimal(10, 2)
+  internalNotes      String?
+  publicNotes        String?
+  customerSignature  String?
+  signatureAt        DateTime?
+  assignedToId       String?
+  assignedTo         User?        @relation("AssignedRepairs", fields: [assignedToId], references: [id], onDelete: SetNull)
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+  deliveredAt        DateTime?
+  payments           Payment[]
+  invoice            Invoice?
+  parts              RepairPart[]
+  events             RepairEvent[]
+  photos             RepairPhoto[]
+  warrantyClaims     WarrantyClaim[]
+  communications     CommunicationLog[]
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([quoteStatus])
+  @@index([promisedAt])
+}
+
+
+model RepairPhoto {
+  id        String          @id @default(cuid())
+  repairId  String
+  repair    Repair          @relation(fields: [repairId], references: [id], onDelete: Cascade)
+  kind      RepairPhotoKind @default(BEFORE)
+  dataUrl   String          @db.Text
+  createdAt DateTime        @default(now())
+
+  @@index([repairId, kind])
+}
+
+model RepairEvent {
+  id        String    @id @default(cuid())
+  repairId  String
+  repair    Repair    @relation(fields: [repairId], references: [id], onDelete: Cascade)
+  userId    String?
+  user      User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  type      EventType
+  title     String
+  detail    String?
+  createdAt DateTime  @default(now())
+
+  @@index([repairId, createdAt])
+}
+
+model Payment {
+  id        String        @id @default(cuid())
+  repairId  String
+  repair    Repair        @relation(fields: [repairId], references: [id], onDelete: Cascade)
+  amount    Decimal       @db.Decimal(10, 2)
+  method    PaymentMethod @default(CASH)
+  note      String?
+  createdAt DateTime      @default(now())
+  cashSessionId String?
+  cashSession CashSession? @relation(fields: [cashSessionId], references: [id], onDelete: SetNull)
+}
+
+model InventoryItem {
+  id          String       @id @default(cuid())
+  sku         String       @unique
+  name        String
+  category    String
+  quantity    Int          @default(0)
+  minQuantity Int          @default(0)
+  buyPrice    Decimal      @default(0) @db.Decimal(10, 2)
+  sellPrice   Decimal      @default(0) @db.Decimal(10, 2)
+  updatedAt   DateTime     @updatedAt
+  createdAt   DateTime     @default(now())
+  repairParts RepairPart[]
+
+  @@index([name])
+}
+
+model RepairPart {
+  id              String        @id @default(cuid())
+  repairId        String
+  repair          Repair        @relation(fields: [repairId], references: [id], onDelete: Cascade)
+  inventoryItemId String
+  inventoryItem   InventoryItem @relation(fields: [inventoryItemId], references: [id], onDelete: Restrict)
+  quantity        Int           @default(1)
+  unitPrice       Decimal       @default(0) @db.Decimal(10, 2)
+  createdAt       DateTime      @default(now())
+
+  @@index([repairId])
+  @@index([inventoryItemId])
+}
+
+model Invoice {
+  id        String   @id @default(cuid())
+  invoiceNo Int      @unique @default(autoincrement())
+  repairId  String   @unique
+  repair    Repair   @relation(fields: [repairId], references: [id], onDelete: Cascade)
+  issuedAt  DateTime @default(now())
+  paid      Boolean  @default(false)
+}
+
+
+model CashSession {
+  id             String            @id @default(cuid())
+  openedById     String
+  openedBy       User              @relation(fields: [openedById], references: [id], onDelete: Restrict)
+  status         CashSessionStatus @default(OPEN)
+  openingAmount  Decimal           @default(0) @db.Decimal(10,2)
+  expectedAmount Decimal?          @db.Decimal(10,2)
+  closingAmount  Decimal?          @db.Decimal(10,2)
+  note           String?
+  openedAt       DateTime          @default(now())
+  closedAt       DateTime?
+  payments       Payment[]
+  movements      CashMovement[]
+
+  @@index([status, openedAt])
+}
+
+model CashMovement {
+  id            String           @id @default(cuid())
+  cashSessionId String
+  cashSession   CashSession      @relation(fields: [cashSessionId], references: [id], onDelete: Cascade)
+  type          CashMovementType
+  amount        Decimal          @db.Decimal(10,2)
+  label         String
+  note          String?
+  createdAt     DateTime         @default(now())
+
+  @@index([cashSessionId, createdAt])
+}
+
+model WarrantyClaim {
+  id          String              @id @default(cuid())
+  repairId    String
+  repair      Repair              @relation(fields: [repairId], references: [id], onDelete: Cascade)
+  status      WarrantyClaimStatus @default(OPEN)
+  reason      String
+  diagnosis   String?
+  resolution  String?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  resolvedAt  DateTime?
+
+  @@index([status, createdAt])
+}
+
+model CommunicationLog {
+  id        String              @id @default(cuid())
+  clientId  String
+  client    Client              @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  repairId  String?
+  repair    Repair?             @relation(fields: [repairId], references: [id], onDelete: SetNull)
+  channel   ContactChannel
+  status    CommunicationStatus @default(SENT)
+  subject   String?
+  message   String              @db.Text
+  createdAt DateTime            @default(now())
+
+  @@index([clientId, createdAt])
+  @@index([repairId, createdAt])
+}
+
+model AuditLog {
+  id        String      @id @default(cuid())
+  userId    String?
+  user      User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action    AuditAction
+  entity    String
+  entityId  String?
+  detail    String?     @db.Text
+  ip        String?
+  createdAt DateTime    @default(now())
+
+  @@index([createdAt])
+  @@index([entity, entityId])
+}
