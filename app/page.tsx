@@ -4,80 +4,116 @@ import AppShell from '@/components/AppShell'
 import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { eur, statusLabel } from '@/lib/format'
-import { ArrowRight, CalendarDays, ClipboardList, CreditCard, FileText, Search, ShieldCheck, Users, Wrench } from 'lucide-react'
+import {
+  Activity, AlertTriangle, ArrowRight, Banknote, CalendarDays, CheckCircle2, ClipboardList,
+  Clock3, CreditCard, Gauge, Package, Plus, ReceiptText, ShieldCheck, ShoppingCart,
+  Smartphone, Sparkles, TrendingUp, Users, WalletCards, Wrench
+} from 'lucide-react'
 
-function sum<T>(items: T[], pick: (item: T) => number) {
-  return items.reduce((total, item) => total + pick(item), 0)
-}
+function sum<T>(items:T[], pick:(item:T)=>number){return items.reduce((a,v)=>a+pick(v),0)}
 
-export default async function Page() {
-  const session = await getSession()
-  if (!session) redirect('/login')
+export default async function Page(){
+ const s=await getSession(); if(!s) redirect('/login')
+ const now=new Date()
+ const today=new Date(now.getFullYear(),now.getMonth(),now.getDate())
+ const tomorrow=new Date(today); tomorrow.setDate(tomorrow.getDate()+1)
+ const monthStart=new Date(now.getFullYear(),now.getMonth(),1)
+ const prevStart=new Date(now.getFullYear(),now.getMonth()-1,1)
+ const sixStart=new Date(now.getFullYear(),now.getMonth()-5,1)
 
-  const now = new Date()
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
-  const previousStart = new Date(now.getFullYear(), now.getMonth() - 1, 1)
-  const sixStart = new Date(now.getFullYear(), now.getMonth() - 5, 1)
-  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-  const tomorrow = new Date(todayStart)
-  tomorrow.setDate(tomorrow.getDate() + 1)
+ const [recentRepairs,clients,statuses,active,ready,warranties,monthPayments,prevPayments,sixPayments,monthSales,prevSales,sixSales,lowStock,overdue,currentCash]=await Promise.all([
+  prisma.repair.findMany({take:7,orderBy:{updatedAt:'desc'},include:{client:true,assignedTo:true,payments:true}}),
+  prisma.client.count(),
+  prisma.repair.groupBy({by:['status'],_count:{_all:true}}),
+  prisma.repair.count({where:{status:{notIn:['DELIVERED','CANCELLED']}}}),
+  prisma.repair.count({where:{status:'READY'}}),
+  prisma.repair.count({where:{warrantyUntil:{gte:now}}}),
+  prisma.payment.findMany({where:{createdAt:{gte:monthStart}},select:{amount:true,method:true,createdAt:true}}),
+  prisma.payment.findMany({where:{createdAt:{gte:prevStart,lt:monthStart}},select:{amount:true}}),
+  prisma.payment.findMany({where:{createdAt:{gte:sixStart}},select:{amount:true,createdAt:true}}),
+  prisma.posSale.findMany({where:{createdAt:{gte:monthStart}},select:{total:true,refundedAmount:true,paymentMethod:true,createdAt:true}}),
+  prisma.posSale.findMany({where:{createdAt:{gte:prevStart,lt:monthStart}},select:{total:true,refundedAmount:true}}),
+  prisma.posSale.findMany({where:{createdAt:{gte:sixStart}},select:{total:true,refundedAmount:true,createdAt:true}}),
+  prisma.inventoryItem.findMany({where:{quantity:{lte:1}},take:5,orderBy:{quantity:'asc'}}),
+  prisma.repair.findMany({where:{promisedAt:{lt:now},status:{notIn:['READY','DELIVERED','CANCELLED']}},take:5,orderBy:{promisedAt:'asc'},include:{client:true}}),
+  prisma.cashSession.findFirst({where:{status:'OPEN'},orderBy:{openedAt:'desc'},include:{openedBy:true}})
+ ])
 
-  const [repairs, clients, ready, active, monthPayments, previousPayments, sixRows, statuses, warranties] = await Promise.all([
-    prisma.repair.findMany({ take: 8, orderBy: { updatedAt: 'desc' }, include: { client: true } }),
-    prisma.client.count(),
-    prisma.repair.count({ where: { status: 'READY' } }),
-    prisma.repair.count({ where: { status: { notIn: ['DELIVERED', 'CANCELLED'] } } }),
-    prisma.payment.findMany({ where: { createdAt: { gte: monthStart } }, select: { amount: true, method: true, createdAt: true } }),
-    prisma.payment.aggregate({ where: { createdAt: { gte: previousStart, lt: monthStart } }, _sum: { amount: true } }),
-    prisma.payment.findMany({ where: { createdAt: { gte: sixStart } }, select: { amount: true, createdAt: true } }),
-    prisma.repair.groupBy({ by: ['status'], _count: { _all: true } }),
-    prisma.repair.count({ where: { warrantyUntil: { gte: now } } }),
-  ])
+ const statusMap=Object.fromEntries(statuses.map(x=>[x.status,x._count._all])) as Record<string,number>
+ const repairMonth=sum(monthPayments,p=>Number(p.amount))
+ const posMonth=sum(monthSales,sale=>Number(sale.total)-Number(sale.refundedAmount))
+ const monthTotal=repairMonth+posMonth
+ const prevTotal=sum(prevPayments,p=>Number(p.amount))+sum(prevSales,sale=>Number(sale.total)-Number(sale.refundedAmount))
+ const growth=prevTotal?((monthTotal-prevTotal)/prevTotal)*100:0
+ const repairToday=sum(monthPayments.filter(p=>p.createdAt>=today),p=>Number(p.amount))
+ const posToday=sum(monthSales.filter(x=>x.createdAt>=today),x=>Number(x.total)-Number(x.refundedAmount))
+ const todayTotal=repairToday+posToday
+ const cardToday=sum(monthPayments.filter(p=>p.createdAt>=today&&p.method==='CARD'),p=>Number(p.amount))+sum(monthSales.filter(x=>x.createdAt>=today&&x.paymentMethod==='CARD'),x=>Number(x.total)-Number(x.refundedAmount))
+ const cashToday=sum(monthPayments.filter(p=>p.createdAt>=today&&p.method==='CASH'),p=>Number(p.amount))+sum(monthSales.filter(x=>x.createdAt>=today&&x.paymentMethod==='CASH'),x=>Number(x.total)-Number(x.refundedAmount))
+ const avgTicket=(monthPayments.length+monthSales.length)?monthTotal/(monthPayments.length+monthSales.length):0
+ const workload=Math.min(100,Math.round((active/18)*100))
+ const due=recentRepairs.reduce((total,r)=>total+Math.max(0,Number(r.total)-r.payments.reduce((a,p)=>a+Number(p.amount),0)),0)
+ const series=Array.from({length:6},(_,i)=>{
+  const start=new Date(now.getFullYear(),now.getMonth()-5+i,1)
+  const end=new Date(now.getFullYear(),now.getMonth()-4+i,1)
+  const repairs=sum(sixPayments.filter(p=>p.createdAt>=start&&p.createdAt<end),p=>Number(p.amount))
+  const pos=sum(sixSales.filter(x=>x.createdAt>=start&&x.createdAt<end),x=>Number(x.total)-Number(x.refundedAmount))
+  return {label:start.toLocaleDateString('fr-FR',{month:'short'}).replace('.',''),value:repairs+pos}
+ })
+ const maxSeries=Math.max(...series.map(x=>x.value),1)
+ const todayJobs=recentRepairs.filter(r=>r.promisedAt&&r.promisedAt>=today&&r.promisedAt<tomorrow).slice(0,4)
 
-  const monthAmount = sum(monthPayments, p => Number(p.amount))
-  const previousAmount = Number(previousPayments._sum.amount || 0)
-  const growth = previousAmount ? ((monthAmount - previousAmount) / previousAmount) * 100 : 0
-  const statusMap = Object.fromEntries(statuses.map(item => [item.status, item._count._all])) as Record<string, number>
-  const todayAmount = sum(monthPayments.filter(p => p.createdAt >= todayStart), p => Number(p.amount))
-  const cashAmount = sum(monthPayments.filter(p => p.method === 'CASH'), p => Number(p.amount))
-  const series = Array.from({ length: 6 }, (_, index) => {
-    const start = new Date(now.getFullYear(), now.getMonth() - 5 + index, 1)
-    const end = new Date(now.getFullYear(), now.getMonth() - 4 + index, 1)
-    return { label: start.toLocaleDateString('fr-FR', { month: 'short' }).replace('.', ''), value: sum(sixRows.filter(p => p.createdAt >= start && p.createdAt < end), p => Number(p.amount)) }
-  })
-  const maxSeries = Math.max(...series.map(item => item.value), 1)
-  const todayRepairs = repairs.filter(r => r.promisedAt && r.promisedAt >= todayStart && r.promisedAt < tomorrow).slice(0, 4)
+ return <AppShell>
+  <div className="v15-command">
+   <style>{`
+    .v15-command{max-width:1500px;margin:0 auto;color:#18263b}.v15-command *{box-sizing:border-box}
+    .v15-command .hero{display:flex;justify-content:space-between;gap:18px;align-items:flex-end;margin-bottom:16px}.v15-command .eyebrow{font-size:8px;font-weight:900;letter-spacing:1.6px;color:#65758b}.v15-command h1{margin:4px 0 5px;font-size:31px;letter-spacing:-1px;color:#132238}.v15-command .hero p{margin:0;font-size:10px;color:#8794a6}.v15-command .hero-actions{display:flex;gap:8px;flex-wrap:wrap}.v15-command .hero-actions .btn{height:38px;border-radius:10px;font-size:9px}.v15-command .hero-actions .btn.primary{background:#2168c9;color:#fff;border:0}.v15-command .hero-actions .btn.secondary{background:#fff;border:1px solid #dce5ef;color:#34465e}
+    .v15-command .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.v15-command .kpi{position:relative;overflow:hidden;padding:15px;min-height:124px;border:1px solid #dfe7f0;border-radius:14px;background:#fff;box-shadow:0 7px 22px rgba(26,48,78,.045)}.v15-command .kpi:before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:#2e75d6}.v15-command .kpi.green:before{background:#18a16b}.v15-command .kpi.purple:before{background:#7654c8}.v15-command .kpi.orange:before{background:#e88720}.v15-command .kpi.slate:before{background:#52657c}.v15-command .kpi-top{display:flex;justify-content:space-between;align-items:center}.v15-command .kpi-icon{width:31px;height:31px;border-radius:9px;display:grid;place-items:center;background:#eef5ff;color:#2d73d5}.v15-command .green .kpi-icon{background:#ecfaf3;color:#159a67}.v15-command .purple .kpi-icon{background:#f2edff;color:#7654c8}.v15-command .orange .kpi-icon{background:#fff4e8;color:#df831f}.v15-command .slate .kpi-icon{background:#eef1f5;color:#52657c}.v15-command .kpi small{display:block;margin-top:10px;font-size:7px;font-weight:900;letter-spacing:.7px;color:#748297}.v15-command .kpi strong{display:block;margin-top:2px;font-size:21px;color:#17243a}.v15-command .kpi em{display:block;margin-top:2px;font-size:8px;font-style:normal;color:#8b98a8}.v15-command .positive{color:#159a67!important}.v15-command .negative{color:#d64e5c!important}
+    .v15-command .main-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(330px,.75fr);gap:10px;margin-top:10px}.v15-command .card{background:#fff;border:1px solid #dfe7f0;border-radius:14px;box-shadow:0 7px 22px rgba(26,48,78,.035);padding:15px}.v15-command .card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:13px}.v15-command .card-head h2{margin:0;font-size:13px;color:#1c2c43;display:flex;align-items:center;gap:7px}.v15-command .card-head p{margin:3px 0 0;font-size:8px;color:#8b97a7}.v15-command .card-head a{font-size:8px;font-weight:900;color:#2c72d1}.v15-command .chart{height:205px;display:flex;align-items:flex-end;gap:9px;padding:8px 3px 0}.v15-command .col{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px}.v15-command .bar-track{width:min(48px,100%);height:145px;background:#f1f4f8;border-radius:8px 8px 4px 4px;display:flex;align-items:flex-end;overflow:hidden}.v15-command .bar{width:100%;background:linear-gradient(180deg,#55a0f2,#236ccf);border-radius:8px 8px 4px 4px}.v15-command .col b{font-size:8px;color:#52637a}.v15-command .col span{font-size:7px;color:#8995a5;font-weight:800}
+    .v15-command .split{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.v15-command .pipeline{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}.v15-command .pipeline a{padding:11px 8px;border:1px solid #e4eaf1;border-radius:10px;background:#f9fbfd;text-align:center;color:#526175}.v15-command .pipeline a:hover{border-color:#c6d8ed;background:#f4f8fd}.v15-command .pipeline strong{display:block;font-size:20px;color:#1a2b43}.v15-command .pipeline span{display:block;margin-top:3px;font-size:7px}.v15-command .cashbox{display:grid;grid-template-columns:1fr 1fr;gap:8px}.v15-command .cashstat{padding:12px;border-radius:10px;background:#f8fafc;border:1px solid #e4eaf1}.v15-command .cashstat small{display:block;font-size:7px;color:#8190a2}.v15-command .cashstat strong{display:block;margin-top:3px;font-size:16px}.v15-command .cash-status{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;padding:10px 11px;border-radius:10px;background:${currentCash?'#eefaf4':'#fff7ed'};border:1px solid ${currentCash?'#cfeadd':'#f1dec4'};font-size:8px;color:${currentCash?'#167b58':'#9b661f'}}
+    .v15-command .alerts{display:grid;gap:7px}.v15-command .alert{display:grid;grid-template-columns:30px 1fr auto;gap:8px;align-items:center;padding:9px;border:1px solid #e7edf3;border-radius:9px}.v15-command .alert-icon{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:#fff3e7;color:#df821f}.v15-command .alert b{display:block;font-size:8px;color:#2b3b52}.v15-command .alert small{display:block;margin-top:2px;font-size:7px;color:#8d99a8}.v15-command .alert strong{font-size:9px;color:#24364f}.v15-command .success{padding:12px;border-radius:9px;background:#eefaf4;color:#19795a;font-size:8px}
+    .v15-command table{width:100%;border-collapse:collapse}.v15-command th{padding:9px;text-align:left;background:#f7f9fc;border-bottom:1px solid #e1e8ef;font-size:7px;letter-spacing:.5px;color:#768497}.v15-command td{padding:9px;border-bottom:1px solid #edf1f5;font-size:8px;color:#415168}.v15-command .row-link{font-weight:900;color:#246dcc}.v15-command .device{font-weight:800;color:#25364e}.v15-command .badge{font-size:7px;font-weight:900;padding:4px 6px;border-radius:999px;background:#eef5ff;color:#3479d1}.v15-command .badge.ready{background:#eaf9f1;color:#159b68}.v15-command .badge.wait{background:#fff3e5;color:#e57a1b}.v15-command .badge.repair{background:#f0ebff;color:#7352c5}
+    .v15-command .quick{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:10px}.v15-command .quick a{display:flex;align-items:center;gap:8px;min-height:62px;padding:10px;border:1px solid #dfe7ef;border-radius:11px;background:#fff;color:#293a51;box-shadow:0 5px 15px rgba(26,48,78,.025)}.v15-command .quick a:hover{border-color:#c7d9ee;transform:translateY(-1px)}.v15-command .quick-icon{width:29px;height:29px;border-radius:8px;display:grid;place-items:center;background:#eef5ff;color:#2d73d5}.v15-command .quick b{font-size:8px}.v15-command .quick small{display:block;margin-top:2px;font-size:7px;color:#8a97a7}.v15-command .footer{display:flex;justify-content:space-between;padding:10px 2px;font-size:7px;color:#96a1ae}
+    @media(max-width:1180px){.v15-command .kpis{grid-template-columns:repeat(3,1fr)}.v15-command .main-grid,.v15-command .split{grid-template-columns:1fr}.v15-command .quick{grid-template-columns:repeat(3,1fr)}}
+    @media(max-width:720px){.v15-command .hero{align-items:flex-start;flex-direction:column}.v15-command .kpis{grid-template-columns:1fr 1fr}.v15-command .pipeline{grid-template-columns:1fr 1fr}.v15-command .quick{grid-template-columns:1fr 1fr}.v15-command h1{font-size:26px}}
+    @media(max-width:480px){.v15-command .kpis,.v15-command .quick{grid-template-columns:1fr}}
+   `}</style>
 
-  return (
-    <AppShell>
-      <style>{`
-        .v14-design{color:#18263b;max-width:1480px;margin:0 auto}.v14-design *{box-sizing:border-box}
-        .v14-top{display:flex;align-items:center;justify-content:space-between;gap:18px;margin:-6px 0 22px;padding-bottom:14px;border-bottom:1px solid #e5ebf2}
-        .v14-searchbar{height:44px;max-width:620px;flex:1;display:flex;align-items:center;gap:10px;padding:0 14px;background:#fff;border:1px solid #dce5ef;border-radius:12px;color:#7b899c;box-shadow:0 3px 12px rgba(30,55,90,.035)}.v14-searchbar span{font-size:12px}.v14-searchbar kbd{margin-left:auto;border:1px solid #d9e1eb;border-radius:6px;padding:3px 7px;background:#f7f9fc;color:#8b98a8;font-size:9px}
-        .v14-user{display:flex;align-items:center;gap:9px;border:1px solid #dce5ef;border-radius:12px;padding:5px 9px;background:#fff}.v14-user-avatar{width:31px;height:31px;border-radius:9px;background:#edf4ff;color:#2e74d3;display:grid;place-items:center;font-weight:900}.v14-user b,.v14-user small{display:block}.v14-user b{font-size:10px}.v14-user small{font-size:8px;color:#8a97a8;margin-top:2px}
-        .v14-title{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin-bottom:18px}.v14-eyebrow{font-size:9px;font-weight:900;letter-spacing:1.5px;color:#718096}.v14-title h1{margin:4px 0;font-size:30px;line-height:1.1;letter-spacing:-.9px;color:#15243a}.v14-title p{margin:0;color:#8a97a8;font-size:11px}.v14-filters{display:flex;gap:8px}.v14-filter{height:37px;border:1px solid #dce5ef;background:#fff;border-radius:9px;padding:0 11px;color:#405067;font-size:10px}
-        .v14-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.v14-kpi{min-height:170px;position:relative;overflow:hidden;padding:16px;border:1px solid #dfe7f0;border-radius:14px;background:#fff;box-shadow:0 8px 25px rgba(28,52,82,.045)}.v14-kpi.blue{background:linear-gradient(135deg,#f0f7ff,#fff)}.v14-kpi.green{background:linear-gradient(135deg,#eefbf5,#fff)}.v14-kpi.purple{background:linear-gradient(135deg,#f7f2ff,#fff)}.v14-kpi.orange{background:linear-gradient(135deg,#fff7ed,#fff)}.v14-kpi-icon{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;color:#fff;background:#347fe2;margin-bottom:11px}.v14-kpi.green .v14-kpi-icon{background:#17a96e}.v14-kpi.purple .v14-kpi-icon{background:#7b55d2}.v14-kpi.orange .v14-kpi-icon{background:#ed861d}.v14-kpi small{display:block;color:#68778b;font-size:8px;font-weight:900;letter-spacing:.55px}.v14-kpi strong{display:block;margin:4px 0;font-size:23px;letter-spacing:-.4px;color:#18263b}.v14-kpi em{display:block;font-style:normal;font-size:9px;font-weight:800}.v14-kpi em.up{color:#149b66}.v14-kpi .mini{position:absolute;right:15px;top:22px;display:flex;align-items:flex-end;gap:4px;height:46px}.v14-kpi .mini i{width:5px;border-radius:4px 4px 0 0;background:#4a92ed55}.v14-kpi.green .mini i{background:#2ab37b55}.v14-kpi.purple .mini i{background:#8c68db55}.v14-kpi.orange .mini i{background:#f2a04d55}.v14-kpi-foot{display:flex;justify-content:space-between;gap:8px;margin-top:13px;padding-top:9px;border-top:1px solid #e2e9f1;font-size:8px;color:#8491a2}.v14-kpi-foot b{color:#41516a;font-size:9px}.v14-kpi-link{position:absolute;left:16px;bottom:13px;color:#2d73d5;font-size:8px;font-weight:900;display:flex;align-items:center;gap:4px}
-        .v14-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(300px,.8fr);gap:12px;margin-top:12px}.v14-card{background:#fff;border:1px solid #dfe7f0;border-radius:13px;box-shadow:0 7px 22px rgba(28,52,82,.04);padding:16px}.v14-card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:15px}.v14-card-head h2{margin:0;font-size:14px;color:#1d2c42}.v14-card-head p{margin:3px 0 0;font-size:8px;color:#8b97a7}.v14-card-head a{font-size:9px;color:#2e75d2;font-weight:800}
-        .v14-chart{height:210px;display:flex;align-items:flex-end;gap:12px;padding:8px 3px 0}.v14-chart-col{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:7px}.v14-chart-col .track{width:min(44px,100%);height:145px;border-radius:8px 8px 3px 3px;background:#f0f3f7;display:flex;align-items:flex-end;overflow:hidden}.v14-chart-col .fill{width:100%;border-radius:8px 8px 3px 3px;background:linear-gradient(180deg,#4a96ed,#2d73d5)}.v14-chart-col b{font-size:8px;color:#6e7c90}.v14-chart-col span{font-size:8px;color:#53637a;font-weight:800}
-        .v14-statuses{display:grid;grid-template-columns:1fr 1fr;gap:8px}.v14-status{padding:12px;border-radius:10px;background:#f8fafc;border:1px solid #e5ebf2}.v14-status strong{display:block;font-size:20px;color:#1a2940}.v14-status span{display:block;margin-top:3px;font-size:8px;color:#7d8a9c}.v14-status.blue{background:#f1f7ff}.v14-status.blue strong{color:#2d73d5}.v14-status.orange{background:#fff7ed}.v14-status.orange strong{color:#e77d1c}.v14-status.green{background:#eefbf5}.v14-status.green strong{color:#159c67}
-        .v14-list{display:grid;gap:7px}.v14-row{display:grid;grid-template-columns:34px 1fr auto;gap:8px;align-items:center;padding:9px;border:1px solid #e7edf3;border-radius:9px}.v14-row-icon{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;background:#eef5ff;color:#2d73d5}.v14-row b{display:block;font-size:9px;color:#2a3950}.v14-row small{display:block;font-size:8px;color:#8996a7;margin-top:2px}.v14-badge{font-size:7px;font-weight:900;padding:4px 6px;border-radius:999px;background:#eef5ff;color:#3479d1}.v14-badge.ready{background:#eaf9f1;color:#159b68}.v14-badge.wait{background:#fff3e5;color:#e57a1b}
-        .v14-quick{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-top:12px}.v14-quick a{display:flex;align-items:center;gap:8px;min-height:68px;padding:10px;border:1px solid #dfe7f0;border-radius:10px;background:#fff;color:#25354d;box-shadow:0 5px 15px rgba(28,52,82,.03)}.v14-quick a:hover{border-color:#c9d9ed;transform:translateY(-1px)}.v14-quick-icon{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;background:#eef5ff;color:#2d73d5}.v14-quick a:nth-child(2) .v14-quick-icon{background:#eefbf5;color:#159d69}.v14-quick a:nth-child(3) .v14-quick-icon{background:#fff4e8;color:#e77d1c}.v14-quick a:nth-child(4) .v14-quick-icon{background:#f3edff;color:#7b55d4}.v14-quick a:nth-child(5) .v14-quick-icon{background:#eaf8fa;color:#1594a2}.v14-quick b{font-size:8px}.v14-quick small{display:block;font-size:7px;color:#8b97a7;margin-top:2px}.v14-footer{display:flex;justify-content:space-between;padding:9px 2px;color:#929dad;font-size:8px}.v14-online{width:6px;height:6px;border-radius:50%;display:inline-block;background:#18a56d;margin-right:5px}
-        @media(max-width:1100px){.v14-kpis{grid-template-columns:repeat(2,1fr)}.v14-grid{grid-template-columns:1fr}.v14-quick{grid-template-columns:repeat(3,1fr)}}@media(max-width:700px){.v14-top,.v14-title{align-items:stretch;flex-direction:column}.v14-user{display:none}.v14-kpis,.v14-quick{grid-template-columns:1fr 1fr}.v14-searchbar{max-width:none}}@media(max-width:480px){.v14-kpis,.v14-quick{grid-template-columns:1fr}.v14-title h1{font-size:26px}.v14-chart{gap:6px}}
-      `}</style>
-      <div className="v14-design">
-        <div className="v14-top"><div className="v14-searchbar"><Search size={16}/><span>Rechercher un client, un ticket, un appareil...</span><kbd>Ctrl + K</kbd></div><div className="v14-user"><div className="v14-user-avatar">{session.name.slice(0,1).toUpperCase()}</div><div><b>LUXURY PHONE</b><small>Propriétaire</small></div></div></div>
-        <div className="v14-title"><div><div className="v14-eyebrow">LUXURY PHONE · MANAGER V14</div><h1>Tableau de bord</h1><p>Pilotage de l’atelier · {now.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</p></div><div className="v14-filters"><button className="v14-filter"><CalendarDays size={13}/> {now.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})}</button></div></div>
-        <div className="v14-kpis">
-          <section className="v14-kpi blue"><div className="v14-kpi-icon"><CreditCard size={17}/></div><small>ENCAISSEMENTS DU MOIS</small><strong>{eur(monthAmount)}</strong><em className="up">{growth>=0?'↑':'↓'} {Math.abs(growth).toFixed(1)}% <span>vs mois précédent</span></em><div className="mini">{series.map((item,i)=><i key={i} style={{height:`${Math.max(10,(item.value/maxSeries)*44)}px`}}/>)}</div><div className="v14-kpi-foot"><span>Aujourd’hui</span><b>{eur(todayAmount)}</b></div><Link className="v14-kpi-link" href="/invoices">Voir les encaissements <ArrowRight size={12}/></Link></section>
-          <section className="v14-kpi green"><div className="v14-kpi-icon"><Wrench size={17}/></div><small>PRISES EN CHARGE ACTIVES</small><strong>{active}</strong><em className="up">{ready} prêt{ready>1?'s':''} à restituer</em><div className="v14-kpi-foot"><span>Réparation</span><b>{statusMap.REPAIRING || 0}</b><span>Pièces</span><b>{statusMap.WAITING_PART || 0}</b></div><Link className="v14-kpi-link" href="/repairs">Voir l’atelier <ArrowRight size={12}/></Link></section>
-          <section className="v14-kpi purple"><div className="v14-kpi-icon"><Users size={17}/></div><small>CLIENTS</small><strong>{clients}</strong><em className="up">Base client active</em><div className="v14-kpi-foot"><span>Garanties actives</span><b>{warranties}</b></div><Link className="v14-kpi-link" href="/clients">Voir les clients <ArrowRight size={12}/></Link></section>
-          <section className="v14-kpi orange"><div className="v14-kpi-icon"><ShieldCheck size={17}/></div><small>QUALITÉ & RESTITUTION</small><strong>{ready}</strong><em className="up">Appareils prêts</em><div className="v14-kpi-foot"><span>À restituer</span><b>{ready}</b></div><Link className="v14-kpi-link" href="/repairs">Ouvrir l’atelier <ArrowRight size={12}/></Link></section>
-        </div>
-        <div className="v14-grid"><section className="v14-card"><div className="v14-card-head"><div><h2>Encaissements · 6 mois</h2><p>Évolution des paiements enregistrés</p></div><Link href="/reports">Rapports <ArrowRight size={11}/></Link></div><div className="v14-chart">{series.map(item=><div className="v14-chart-col" key={item.label}><div className="track"><i className="fill" style={{height:`${Math.max(3,(item.value/maxSeries)*100)}%`}}/></div><span>{eur(item.value)}</span><b>{item.label}</b></div>)}</div></section><section className="v14-card"><div className="v14-card-head"><div><h2>État de l’atelier</h2><p>Répartition des dossiers</p></div><Link href="/repairs">Tout voir</Link></div><div className="v14-statuses"><div className="v14-status blue"><strong>{statusMap.DIAGNOSTIC || 0}</strong><span>Diagnostic</span></div><div className="v14-status orange"><strong>{statusMap.WAITING_PART || 0}</strong><span>En attente de pièces</span></div><div className="v14-status green"><strong>{statusMap.REPAIRING || 0}</strong><span>En réparation</span></div><div className="v14-status"><strong>{ready}</strong><span>Prêts à restituer</span></div></div></section></div>
-        <div className="v14-grid"><section className="v14-card"><div className="v14-card-head"><div><h2>Dernières prises en charge</h2><p>Les dossiers récemment modifiés</p></div><Link href="/repairs">Voir tout</Link></div><div className="v14-list">{repairs.slice(0,6).map(repair=><div className="v14-row" key={repair.id}><div className="v14-row-icon"><ClipboardList size={15}/></div><div><b>#{String(repair.ticketNo).padStart(4,'0')} · {repair.deviceBrand} {repair.deviceModel}</b><small>{repair.client.name} · {repair.issue.slice(0,60)}{repair.issue.length>60?'…':''}</small></div><span className={`v14-badge ${repair.status==='READY'?'ready':repair.status==='WAITING_PART'?'wait':''}`}>{statusLabel[repair.status]}</span></div>)}{repairs.length===0&&<div style={{padding:'24px',textAlign:'center',color:'#8b97a7',fontSize:10}}>Aucune prise en charge récente.</div>}</div></section><section className="v14-card"><div className="v14-card-head"><div><h2>À surveiller</h2><p>Les éléments utiles aujourd’hui</p></div></div><div className="v14-list">{todayRepairs.map(repair=><div className="v14-row" key={repair.id}><div className="v14-row-icon"><CalendarDays size={15}/></div><div><b>{repair.client.name}</b><small>#{String(repair.ticketNo).padStart(4,'0')} · {repair.deviceBrand} {repair.deviceModel}</small></div><span className="v14-badge">RDV</span></div>)}<div className="v14-row"><div className="v14-row-icon"><CreditCard size={15}/></div><div><b>Espèces ce mois</b><small>Encaissements en espèces</small></div><span className="v14-badge ready">{eur(cashAmount)}</span></div><div className="v14-row"><div className="v14-row-icon"><ShieldCheck size={15}/></div><div><b>Garanties actives</b><small>Suivi SAV disponible</small></div><span className="v14-badge">{warranties}</span></div></div></section></div>
-        <div className="v14-quick"><Link href="/repairs"><span className="v14-quick-icon"><Wrench size={15}/></span><div><b>Atelier</b><small>Prises en charge</small></div></Link><Link href="/invoices"><span className="v14-quick-icon"><FileText size={15}/></span><div><b>Facturation</b><small>Factures & paiements</small></div></Link><Link href="/clients"><span className="v14-quick-icon"><Users size={15}/></span><div><b>Clients</b><small>Base clients</small></div></Link><Link href="/reports"><span className="v14-quick-icon"><CreditCard size={15}/></span><div><b>Rapports</b><small>Analyse activité</small></div></Link><Link href="/repairs"><span className="v14-quick-icon"><ShieldCheck size={15}/></span><div><b>Qualité</b><small>Contrôle & signature</small></div></Link></div>
-        <div className="v14-footer"><span><i className="v14-online"/>Système opérationnel · V14</span><span>Luxury Phone Manager</span></div>
-      </div>
-    </AppShell>
-  )
+   <section className="hero"><div><div className="eyebrow">LUXURY PHONE · V15 COMMAND CENTER</div><h1>Tableau de bord</h1><p>Pilotage temps réel de l’atelier, de la caisse et des ventes · {now.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</p></div><div className="hero-actions"><Link className="btn secondary" href="/cash/quick"><WalletCards size={15}/> Encaissement</Link><Link className="btn secondary" href="/cash/sales"><ShoppingCart size={15}/> Vente rapide</Link><Link className="btn primary" href="/repairs/new"><Plus size={15}/> Nouvelle prise en charge</Link></div></section>
+
+   <section className="kpis">
+    <div className="kpi"><div className="kpi-top"><span className="kpi-icon"><TrendingUp size={16}/></span><em className={growth>=0?'positive':'negative'}>{growth>=0?'▲':'▼'} {Math.abs(growth).toFixed(1)}%</em></div><small>CA DU MOIS</small><strong>{eur(monthTotal)}</strong><em>réparations + ventes boutique</em></div>
+    <div className="kpi green"><div className="kpi-top"><span className="kpi-icon"><CreditCard size={16}/></span><em>{monthPayments.length+monthSales.length} opération(s)</em></div><small>CA AUJOURD’HUI</small><strong>{eur(todayTotal)}</strong><em>dont {eur(cardToday)} par carte</em></div>
+    <div className="kpi purple"><div className="kpi-top"><span className="kpi-icon"><Wrench size={16}/></span><em>{statusMap.REPAIRING||0} en réparation</em></div><small>DOSSIERS ACTIFS</small><strong>{active}</strong><em>{ready} prêt{ready>1?'s':''} à restituer</em></div>
+    <div className="kpi orange"><div className="kpi-top"><span className="kpi-icon"><Banknote size={16}/></span><em>panier moyen</em></div><small>PANIER MOYEN</small><strong>{eur(avgTicket)}</strong><em>{eur(cashToday)} espèces aujourd’hui</em></div>
+    <div className="kpi slate"><div className="kpi-top"><span className="kpi-icon"><Users size={16}/></span><em>{warranties} garanties</em></div><small>CLIENTS</small><strong>{clients}</strong><em>{eur(due)} à encaisser sur dossiers récents</em></div>
+   </section>
+
+   <section className="main-grid">
+    <div className="card"><div className="card-head"><div><h2><Activity size={16}/> Activité sur 6 mois</h2><p>CA encaissé réparations + ventes nettes de remboursements.</p></div><Link href="/reports">Rapports <ArrowRight size={12}/></Link></div><div className="chart">{series.map((x,i)=><div className="col" key={i}><span>{eur(x.value)}</span><div className="bar-track"><div className="bar" style={{height:`${Math.max(7,(x.value/maxSeries)*100)}%`}}/></div><b>{x.label}</b></div>)}</div></div>
+    <div className="card"><div className="card-head"><div><h2><Gauge size={16}/> État atelier</h2><p>Charge indicative selon les dossiers actifs.</p></div><strong>{workload}%</strong></div><div style={{height:8,borderRadius:99,background:'#edf1f5',overflow:'hidden',marginBottom:13}}><div style={{height:'100%',width:`${workload}%`,background:'linear-gradient(90deg,#2f7dde,#6aa8ef)',borderRadius:99}}/></div><div className="pipeline">{[['DIAGNOSTIC','Diagnostic'],['WAITING_APPROVAL','Accord'],['WAITING_PART','Pièces'],['REPAIRING','Réparation'],['READY','Prêt']].map(([key,label])=><Link key={key} href={`/repairs?status=${key}`}><strong>{statusMap[key]||0}</strong><span>{label}</span></Link>)}</div></div>
+   </section>
+
+   <section className="split">
+    <div className="card"><div className="card-head"><div><h2><ClipboardList size={16}/> Priorités atelier</h2><p>Derniers dossiers modifiés et montants restant à encaisser.</p></div><Link href="/repairs">Tout voir <ArrowRight size={12}/></Link></div><div style={{overflowX:'auto'}}><table><thead><tr><th>DOSSIER</th><th>CLIENT</th><th>APPAREIL</th><th>TECHNICIEN</th><th>STATUT</th><th>RESTE</th></tr></thead><tbody>{recentRepairs.map(r=>{const paid=r.payments.reduce((a,p)=>a+Number(p.amount),0);const left=Math.max(0,Number(r.total)-paid);const badge=r.status==='READY'?'ready':r.status==='REPAIRING'?'repair':['WAITING_APPROVAL','WAITING_PART'].includes(r.status)?'wait':'';return <tr key={r.id}><td><Link className="row-link" href={`/repairs/${r.id}`}>TKT-{String(r.ticketNo).padStart(5,'0')}</Link></td><td>{r.client.name}</td><td><span className="device">{r.deviceBrand} {r.deviceModel}</span></td><td>{r.assignedTo?.name||'—'}</td><td><span className={`badge ${badge}`}>{statusLabel[r.status]}</span></td><td>{eur(left)}</td></tr>})}</tbody></table></div></div>
+    <div className="card"><div className="card-head"><div><h2><Banknote size={16}/> Caisse du jour</h2><p>Lecture immédiate des encaissements et de la session.</p></div><Link href="/cash">Caisse Pro <ArrowRight size={12}/></Link></div><div className="cashbox"><div className="cashstat"><small>Carte</small><strong>{eur(cardToday)}</strong></div><div className="cashstat"><small>Espèces</small><strong>{eur(cashToday)}</strong></div><div className="cashstat"><small>Ventes boutique</small><strong>{eur(posToday)}</strong></div><div className="cashstat"><small>Réparations</small><strong>{eur(repairToday)}</strong></div><div className="cash-status"><span>{currentCash?`Caisse ouverte · ${currentCash.openedBy.name}`:'Caisse actuellement fermée'}</span><strong>{currentCash?'OUVERTE':'FERMÉE'}</strong></div></div></div>
+   </section>
+
+   <section className="split">
+    <div className="card"><div className="card-head"><div><h2><AlertTriangle size={16}/> Alertes prioritaires</h2><p>Retards atelier et références de stock critiques.</p></div></div><div className="alerts">{overdue.slice(0,3).map(r=><Link href={`/repairs/${r.id}`} className="alert" key={r.id}><span className="alert-icon"><Clock3 size={14}/></span><div><b>Retard · TKT-{String(r.ticketNo).padStart(5,'0')} · {r.client.name}</b><small>{r.deviceBrand} {r.deviceModel}</small></div><strong>→</strong></Link>)}{lowStock.slice(0,3).map(x=><Link href="/inventory" className="alert" key={x.id}><span className="alert-icon"><Package size={14}/></span><div><b>Stock faible · {x.name}</b><small>{x.sku} · seuil {x.minQuantity}</small></div><strong>{x.quantity}</strong></Link>)}{!overdue.length&&!lowStock.length&&<div className="success"><CheckCircle2 size={14}/> Aucun point critique actuellement.</div>}</div></div>
+    <div className="card"><div className="card-head"><div><h2><CalendarDays size={16}/> Planning du jour</h2><p>{todayJobs.length} dossier(s) planifié(s).</p></div><Link href="/agenda">Agenda <ArrowRight size={12}/></Link></div><div className="alerts">{todayJobs.map(r=><Link href={`/repairs/${r.id}`} className="alert" key={r.id}><span className="alert-icon" style={{background:'#eef5ff',color:'#2e75d6'}}><Smartphone size={14}/></span><div><b>{r.deviceBrand} {r.deviceModel}</b><small>{r.client.name} · {r.promisedAt?.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</small></div><strong>{statusLabel[r.status]}</strong></Link>)}{!todayJobs.length&&<div className="success">Aucun rendez-vous atelier prévu aujourd’hui.</div>}</div></div>
+   </section>
+
+   <section className="quick">
+    <Link href="/repairs/new"><span className="quick-icon"><Plus size={15}/></span><div><b>Nouvelle réparation</b><small>Créer un dossier</small></div></Link>
+    <Link href="/frontdesk"><span className="quick-icon"><Sparkles size={15}/></span><div><b>Réception express</b><small>Prise en charge rapide</small></div></Link>
+    <Link href="/cash/sales"><span className="quick-icon"><ShoppingCart size={15}/></span><div><b>Vente rapide</b><small>Panier boutique V15</small></div></Link>
+    <Link href="/cash/quick"><span className="quick-icon"><WalletCards size={15}/></span><div><b>Encaissement</b><small>Régler un dossier</small></div></Link>
+    <Link href="/cash"><span className="quick-icon"><ReceiptText size={15}/></span><div><b>Caisse Pro</b><small>Ouverture / clôture</small></div></Link>
+    <Link href="/inventory"><span className="quick-icon"><Package size={15}/></span><div><b>Stock</b><small>Pièces et accessoires</small></div></Link>
+   </section>
+
+   <div className="footer"><span>Luxury Phone · V15 Pro Workshop Suite</span><span><ShieldCheck size={10}/> Données synchronisées avec PostgreSQL</span></div>
+  </div>
+ </AppShell>
 }
