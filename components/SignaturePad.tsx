@@ -58,7 +58,7 @@ export default function SignaturePad(){
  return <div className="signature-pad">
   <div className="signature-pad-head"><span><PenLine size={16}/> Signature manuscrite</span><button type="button" className="text-link" onClick={clear} disabled={!signature}><Eraser size={14}/> Effacer</button></div>
   <div className="signature-canvas-wrap">
-   <canvas ref={canvasRef} className="signature-canvas" onPointerDown={start} onPointerMove={move} onPointerUp={end} onPointerCancel={end} aria-label="Zone de signature" />
+   <canvas ref={canvasRef} className="signature-canvas" style={{touchAction:'none',display:'block',width:'100%',height:180}} onPointerDown={start} onPointerMove={move} onPointerUp={end} onPointerCancel={end} aria-label="Zone de signature" />
    {!signature&&<div className="signature-placeholder">Signez ici avec votre doigt ou votre stylet</div>}
   </div>
   <input type="hidden" name="signature" value={signature} readOnly required />
