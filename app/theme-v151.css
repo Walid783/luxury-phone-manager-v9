@@ -1,0 +1,121 @@
+/* Luxury Phone Manager V15.1 — Hybrid Premium Theme */
+:root{
+  --lp-bg:#f3f6fa;
+  --lp-surface:#ffffff;
+  --lp-surface-soft:#f8fafc;
+  --lp-border:#dce4ee;
+  --lp-text:#172338;
+  --lp-muted:#66758a;
+  --lp-navy:#0c1420;
+  --lp-navy2:#111d2d;
+  --lp-blue:#2568c8;
+  --lp-blue2:#3f83dc;
+  --lp-gold:#d6a341;
+  --lp-green:#159b68;
+  --lp-red:#d5525e;
+}
+
+html,body{background:var(--lp-bg)!important;color:var(--lp-text)!important}
+body{font-size:16px!important;line-height:1.55!important}
+
+/* Hybrid shell */
+.shell,.suite-shell{background:var(--lp-bg)!important}
+.side,.suite-side,.v6-side{background:linear-gradient(180deg,var(--lp-navy) 0%,#080e17 100%)!important;border-right:1px solid #1d2b3c!important;box-shadow:10px 0 34px rgba(18,32,52,.08)!important}
+.brand,.suite-brand{color:#fff!important}
+.brand span,.suite-brand span{color:#f1c46d!important}
+.brand small,.suite-brand small{color:#8fa0b6!important}
+.brand-mark{background:linear-gradient(135deg,#f4cf7b,#bb8124)!important;color:#171006!important;box-shadow:0 10px 26px rgba(218,169,65,.22)!important}
+.workspace-card{background:linear-gradient(135deg,#142236,#0d1725)!important;border-color:#24364c!important;color:#fff!important}
+.workspace-card small{color:#95a5b9!important}
+.nav-section-label{color:#73859b!important}
+.v6-nav a,.nav a{color:#b7c3d3!important}
+.v6-nav a:hover,.nav a:hover{background:#162338!important;color:#fff!important;border-color:#263a53!important}
+.v6-nav a em{background:#1d3150!important;border-color:#315a8a!important;color:#a9cff8!important}
+.user-pill{background:#111a27!important;border-color:#27374b!important;color:#f1f5f9!important}
+.avatar{background:#1c2b40!important;color:#f2c36b!important}
+.icon-btn{background:#121c2a!important;border-color:#2a3b50!important;color:#e6edf7!important}
+
+/* Topbar */
+.suite-topbar,.v6-topbar{background:rgba(255,255,255,.96)!important;border-bottom:1px solid var(--lp-border)!important;box-shadow:0 5px 22px rgba(31,55,82,.05)!important}
+.global-search{background:#f7f9fc!important;border-color:#d4dee9!important;color:var(--lp-text)!important}
+.global-search input{color:var(--lp-text)!important;font-size:14px!important}
+.global-search input::placeholder{color:#7d8b9c!important}
+.today,.top-icon{background:#fff!important;border-color:#dbe4ed!important;color:#4a5d75!important}
+.top-create{background:linear-gradient(180deg,#2f78d5,#215fb9)!important;color:#fff!important;box-shadow:0 8px 20px rgba(37,104,200,.22)!important}
+.suite-main,.v6-main,.main{background:linear-gradient(180deg,#f7f9fc 0%,#f2f5f9 100%)!important;color:var(--lp-text)!important}
+
+/* Global cards / surfaces */
+.card,.kpi-card,.info-card,.money-card,.v7-commandbar,.v7-filter-card,.v7-board-card{background:var(--lp-surface)!important;border-color:var(--lp-border)!important;color:var(--lp-text)!important;box-shadow:0 8px 26px rgba(30,54,80,.055)!important}
+.card h1,.card h2,.card h3,.card b,.card strong,.section-title h2,.hero-head h1{color:var(--lp-text)!important}
+.card p,.section-title p,.cell-sub,.muted,.info-card small,.kpi-card small{color:var(--lp-muted)!important}
+
+/* Forms */
+input,select,textarea{background:#fff!important;color:var(--lp-text)!important;border-color:#ccd8e5!important}
+input::placeholder,textarea::placeholder{color:#8996a6!important}
+input:focus,select:focus,textarea:focus{border-color:#7da9dc!important;box-shadow:0 0 0 3px rgba(37,104,200,.12)!important;outline:none!important}
+.field label,label{color:#43546a!important}
+.search-box{background:#fff!important;border-color:#d3dde8!important;color:#63748a!important}
+
+/* Buttons */
+.btn{background:linear-gradient(180deg,#2f78d5,#215fb9)!important;color:#fff!important;border:1px solid #215fb9!important;box-shadow:0 7px 18px rgba(37,104,200,.16)!important}
+.btn.secondary,.soft-btn{background:#fff!important;color:#33465e!important;border:1px solid #d5dfea!important;box-shadow:none!important}
+.btn.secondary:hover,.soft-btn:hover{background:#f6f9fc!important;border-color:#bfcddd!important}
+
+/* Tables */
+table{background:#fff!important;color:var(--lp-text)!important}
+th{background:#f5f8fb!important;color:#5e6f84!important;border-bottom:1px solid #dbe4ed!important}
+td{color:#33465e!important;border-bottom:1px solid #e7edf3!important}
+tbody tr:hover{background:#f7faff!important}
+.row-link,.text-link{color:#2367c6!important}
+
+/* Repair list V15 */
+.v7-page-head h1{color:#172338!important}
+.v7-page-head p{color:#65758a!important}
+.v7-status-cards .status-card{background:#fff!important;border-color:#dce4ed!important;color:#3a4d64!important;box-shadow:0 6px 18px rgba(30,54,80,.04)!important}
+.v7-status-cards .status-card:hover,.v7-status-cards .status-card.selected{border-color:#9ebce0!important;box-shadow:0 8px 22px rgba(37,104,200,.10)!important}
+.v7-filter-chips a{background:#fff!important;border-color:#d9e3ed!important;color:#43556c!important}
+.v7-filter-chips a.active{background:#eaf2fd!important;color:#215fb9!important;border-color:#a8c6e8!important}
+.v7-table .late-row{background:#fff7f5!important}
+.v7-ticket{background:#fff!important;border-color:#dce4ed!important;color:#25384f!important}
+
+/* Repair detail V15.1 */
+.repair15{color:#172338!important}
+.repair15 .hero{background:linear-gradient(120deg,#0d1725 0%,#13243a 58%,#1b3e66 100%)!important;box-shadow:0 18px 48px rgba(13,30,52,.20)!important}
+.repair15 .card,.repair15 .summary-card{background:#fff!important;border-color:#dce4ed!important;box-shadow:0 8px 24px rgba(31,55,82,.055)!important}
+.repair15 .summary-card.danger{background:#fff6f5!important;border-color:#efcec9!important}
+.repair15 .summary-card.good{background:#f0faf5!important;border-color:#cee9dc!important}
+.repair15 .info>div,.repair15 .issue,.repair15 .photo-zone,.repair15 .payment-item,.repair15 .gate-row{background:#f8fafc!important;border-color:#dfe7ef!important}
+.repair15 .issue p,.repair15 .info b,.repair15 td,.repair15 label{color:#24364e!important}
+.repair15 .callout{background:#f8fafc!important;border-color:#dde6ef!important;color:#4a5c72!important}
+.repair15 .callout.good{background:#eefaf4!important;border-color:#cde8db!important;color:#167653!important}
+.repair15 .callout.warn{background:#fff7ea!important;border-color:#efdcb8!important;color:#8c5d1d!important}
+.repair15 .callout.danger{background:#fff1f3!important;border-color:#efccd2!important;color:#a43d4b!important}
+.repair15 .pill{background:#eaf2fd!important;color:#2367c6!important}
+.repair15 .btnx{background:#fff!important;color:#31445c!important;border-color:#d3deea!important}
+.repair15 .btnx.primary{background:linear-gradient(180deg,#2f78d5,#215fb9)!important;border-color:#215fb9!important;color:#fff!important}
+.repair15 .btnx.gold{background:linear-gradient(180deg,#f2c667,#d9a33d)!important;border-color:#d9a33d!important;color:#1a2434!important}
+.repair15 .btnx.green{background:#159b68!important;border-color:#159b68!important;color:#fff!important}
+
+/* Dashboard V15 */
+.dash15{color:var(--lp-text)!important}
+.dash15 .hero{background:linear-gradient(120deg,#0c1624 0%,#13243a 56%,#1e4774 100%)!important}
+.dash15 .card,.dash15 .kpi{background:#fff!important;border-color:#dce4ed!important;box-shadow:0 8px 24px rgba(31,55,82,.05)!important}
+
+/* Status clarity */
+.badge{font-weight:800!important}
+.badge.green{background:#e8f7ef!important;color:#11764f!important;border-color:#c8e7d8!important}
+.badge.amber{background:#fff5df!important;color:#966217!important;border-color:#efdcb0!important}
+.badge.red{background:#fff0f2!important;color:#b23d4b!important;border-color:#efcbd0!important}
+.badge.blue{background:#eaf2fd!important;color:#215fb9!important;border-color:#c5d9ef!important}
+.badge.purple{background:#f1ebff!important;color:#6c4cb2!important;border-color:#d9cdf3!important}
+.badge.slate{background:#edf1f5!important;color:#4b5d72!important;border-color:#d5dee8!important}
+
+/* Preserve printable invoice white */
+.invoice-sheet{background:#fff!important;color:#121722!important}
+.invoice-sheet *{color:inherit}
+
+@media(max-width:800px){
+ body{font-size:16px!important}
+ .side,.suite-side,.v6-side{box-shadow:none!important}
+ .suite-main,.v6-main,.main{background:#f4f7fa!important}
+}
