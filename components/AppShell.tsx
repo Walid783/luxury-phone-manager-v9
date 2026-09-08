@@ -4,16 +4,18 @@ import {
   LayoutDashboard, ClipboardList, Sparkles, ReceiptText, FileText, Users, ShieldCheck,
   MessageSquareText, ShoppingCart, Monitor, Package, Truck, CalendarDays, UserCog, Settings,
   Search, Bell, Plus, Crown, LogOut, Command, HandCoins, Smartphone, ChevronDown,
-  BarChart3, Printer, ShieldAlert
+  BarChart3, Printer, ShieldAlert, ClipboardCheck, TabletSmartphone
 } from 'lucide-react'
 
 export default async function AppShell({children}:{children:React.ReactNode}){
  const s=await getSession()
  const groups=[
   {label:'ATELIER',items:[
-   ['/', 'Tableau de bord', LayoutDashboard],
+   ['/', 'Tableau de bord V14', LayoutDashboard],
    ['/frontdesk','Réception express',Sparkles],
    ['/repairs','Prises en charge',ClipboardList],
+   ['/checklists','Listes de contrôle',ClipboardCheck],
+   ['/signatures','Tablette de signature',TabletSmartphone],
    ['/invoices','Factures',ReceiptText],
    ['/quotes','Devis',FileText],
    ['/deposits','Acomptes',HandCoins],
