@@ -1,58 +1,67 @@
-.repair15{font-size:14px;line-height:1.5}
-.repair15 .back{font-size:14px!important}
-.repair15 .btnx{font-size:13px!important;height:42px!important;padding:0 14px!important}
-.repair15 .ticket{font-size:12px!important}
-.repair15 .hero h1{font-size:34px!important}
-.repair15 .hero p{font-size:13px!important;color:#d4dfec!important}
-.repair15 .hero-badge{font-size:11px!important;padding:8px 11px!important}
-.repair15 .step b{font-size:11px!important}
-.repair15 .step span{font-size:10px!important}
-.repair15 .summary-card small{font-size:10px!important;color:#66758a!important}
-.repair15 .summary-card strong{font-size:18px!important}
-.repair15 .summary-card em{font-size:10px!important;color:#6f7c8d!important}
-.repair15 .card-head h2{font-size:18px!important}
-.repair15 .card-head p{font-size:12px!important;color:#6f7c8d!important}
-.repair15 .pill{font-size:10px!important}
-.repair15 .info small,.repair15 .issue small{font-size:10px!important;color:#6f7c8d!important}
-.repair15 .info b{font-size:13px!important}
-.repair15 .issue p{font-size:13px!important;line-height:1.6!important}
-.repair15 label{font-size:12px!important;color:#3f4f63!important}
-.repair15 input,.repair15 select,.repair15 textarea{font-size:13px!important;color:#16243a!important;background:#fff!important}
-.repair15 input,.repair15 select{height:42px!important}
-.repair15 .callout{font-size:12px!important}
-.repair15 .photo-zone h3{font-size:12px!important}
-.repair15 .empty{font-size:12px!important}
-.repair15 th{font-size:10px!important;color:#66758a!important}
-.repair15 td{font-size:12px!important}
-.repair15 .sub{font-size:10px!important}
-.repair15 .money{font-size:13px!important}
-.repair15 .money strong{font-size:15px!important}
-.repair15 .money.due strong{font-size:22px!important}
-.repair15 .payment-item b{font-size:12px!important}
-.repair15 .payment-item small{font-size:10px!important}
-.repair15 .gate-row{font-size:12px!important}
-.repair15 .event b{font-size:12px!important}
-.repair15 .event p{font-size:11px!important;line-height:1.5!important}
-.repair15 .event small{font-size:10px!important}
+.repair15{font-size:16px;line-height:1.58}
+.repair15 .back{font-size:15px!important}
+.repair15 .btnx{font-size:14px!important;height:46px!important;padding:0 16px!important}
+.repair15 .ticket{font-size:13px!important;letter-spacing:1.2px!important}
+.repair15 .hero h1{font-size:38px!important;line-height:1.05!important}
+.repair15 .hero p{font-size:15px!important;color:#e6edf6!important}
+.repair15 .hero-badge{font-size:12px!important;padding:9px 12px!important}
+.repair15 .step{padding:12px!important}
+.repair15 .step b{font-size:13px!important;line-height:1.35!important}
+.repair15 .step span{font-size:11px!important;color:#c1cede!important}
+.repair15 .summary-card{padding:14px 15px!important}
+.repair15 .summary-card small{font-size:11px!important;color:#516176!important}
+.repair15 .summary-card strong{font-size:20px!important;line-height:1.25!important}
+.repair15 .summary-card em{font-size:11px!important;color:#5f6e80!important}
+.repair15 .card{padding:18px!important}
+.repair15 .card-head h2{font-size:20px!important;line-height:1.25!important}
+.repair15 .card-head p{font-size:13px!important;color:#58687b!important}
+.repair15 .pill{font-size:11px!important;padding:6px 8px!important}
+.repair15 .info small,.repair15 .issue small{font-size:11px!important;color:#56667a!important}
+.repair15 .info b{font-size:15px!important;line-height:1.4!important}
+.repair15 .issue p{font-size:15px!important;line-height:1.65!important;color:#1b2a40!important}
+.repair15 label{font-size:13px!important;color:#33445a!important;gap:7px!important}
+.repair15 input,.repair15 select,.repair15 textarea{font-size:15px!important;color:#132238!important;background:#fff!important;border-color:#cfd9e4!important}
+.repair15 input,.repair15 select{height:46px!important}
+.repair15 textarea{padding:12px!important;line-height:1.5!important}
+.repair15 .callout{font-size:13px!important;line-height:1.5!important}
+.repair15 .photo-zone h3{font-size:13px!important}
+.repair15 .empty{font-size:13px!important;color:#647489!important}
+.repair15 th{font-size:11px!important;color:#516176!important;padding:11px!important}
+.repair15 td{font-size:14px!important;padding:11px!important}
+.repair15 .sub{font-size:11px!important;color:#66768a!important}
+.repair15 .money{font-size:15px!important;padding:11px 0!important}
+.repair15 .money strong{font-size:17px!important}
+.repair15 .money.due strong{font-size:26px!important}
+.repair15 .payment-item b{font-size:14px!important}
+.repair15 .payment-item small{font-size:11px!important;color:#627287!important}
+.repair15 .gate-row{font-size:13px!important;padding:11px 12px!important}
+.repair15 .event b{font-size:14px!important}
+.repair15 .event p{font-size:13px!important;line-height:1.55!important;color:#4e5f75!important}
+.repair15 .event small{font-size:11px!important;color:#68788d!important}
 
-.v7-page-head h1{font-size:32px!important}
-.v7-page-head p{font-size:14px!important}
-.v7-commandbar,.v7-filter-card,.v7-board-card{font-size:13px}
-.v7-mini-stat b,.v7-mini-stat span{font-size:12px!important}
-.v7-status-cards .status-card span{font-size:11px!important}
-.v7-status-cards .status-card strong{font-size:20px!important}
-.v7-filters input,.v7-filters select{font-size:13px!important;min-height:42px}
-.v7-filter-chips a{font-size:12px!important}
-.v7-table th{font-size:10px!important}
-.v7-table td{font-size:12px!important}
-.v7-table .cell-sub{font-size:10px!important}
-.v7-ticket small,.v7-ticket span,.v7-ticket footer{font-size:10px!important}
-.v7-ticket strong{font-size:13px!important}
+.v7-page-head h1{font-size:36px!important;line-height:1.1!important}
+.v7-page-head p{font-size:15px!important;color:#5f6e80!important}
+.v7-commandbar,.v7-filter-card,.v7-board-card{font-size:14px}
+.v7-mini-stat b,.v7-mini-stat span{font-size:13px!important}
+.v7-status-cards .status-card span{font-size:12px!important}
+.v7-status-cards .status-card strong{font-size:23px!important}
+.v7-filters input,.v7-filters select{font-size:14px!important;min-height:46px}
+.v7-filter-chips a{font-size:13px!important}
+.v7-table th{font-size:11px!important}
+.v7-table td{font-size:14px!important}
+.v7-table .cell-sub{font-size:11px!important}
+.v7-ticket small,.v7-ticket span,.v7-ticket footer{font-size:11px!important}
+.v7-ticket strong{font-size:15px!important}
 
 @media(max-width:760px){
- .repair15{font-size:15px}
- .repair15 .hero h1{font-size:30px!important}
- .repair15 .summary-card strong{font-size:17px!important}
- .repair15 .card-head h2{font-size:17px!important}
- .repair15 .btnx{font-size:13px!important}
+ .repair15{font-size:16px}
+ .repair15 .hero h1{font-size:32px!important}
+ .repair15 .hero p{font-size:14px!important}
+ .repair15 .summary-card strong{font-size:19px!important}
+ .repair15 .card-head h2{font-size:19px!important}
+ .repair15 .btnx{font-size:14px!important;height:46px!important}
+ .repair15 input,.repair15 select,.repair15 textarea{font-size:16px!important}
+ .v7-page-head h1{font-size:30px!important}
+ .v7-page-head p{font-size:15px!important}
+ .v7-table td{font-size:13px!important}
 }
