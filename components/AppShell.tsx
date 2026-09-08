@@ -11,7 +11,7 @@ export default async function AppShell({children}:{children:React.ReactNode}){
  const s=await getSession()
  const groups=[
   {label:'ATELIER',items:[
-   ['/','Tableau de bord V15', LayoutDashboard],
+   ['/','Tableau de bord V15.1', LayoutDashboard],
    ['/frontdesk','Réception express',Sparkles],
    ['/repairs','Prises en charge',ClipboardList],
    ['/checklists','Listes de contrôle',ClipboardCheck],
@@ -59,9 +59,9 @@ export default async function AppShell({children}:{children:React.ReactNode}){
    @media(max-width:800px){.v6-shell .v6-topbar{height:auto;padding:10px 14px;flex-wrap:wrap}.v6-shell .global-search{order:1;flex:1;min-width:210px}.v6-shell .topbar-actions{order:2}.v6-shell .today{display:none}.v6-shell .v6-main{padding:18px 14px;min-height:calc(100vh - 62px)}}
   `}</style>
   <aside className="side suite-side v6-side">
-   <div className="brand suite-brand v6-brand"><div className="brand-mark"><Crown size={17}/></div><div>LUXURY <span>PHONE</span><small>ATELIER OS · V15 PRO WORKSHOP SUITE</small></div></div>
+   <div className="brand suite-brand v6-brand"><div className="brand-mark"><Crown size={17}/></div><div>LUXURY <span>PHONE</span><small>ATELIER OS · V15.1 HYBRID PREMIUM</small></div></div>
    <button className="workspace-card"><div className="workspace-avatar">L</div><div><b>LUXURY PHONE</b><small>Poissy · Propriétaire</small></div><ChevronDown size={16}/></button>
-   <div className="v6-nav-scroll">{groups.map(g=><div key={g.label}><div className="nav-section-label">{g.label}</div><nav className="nav suite-nav v6-nav">{g.items.map(([href,label,Icon])=><Link key={href} href={href}><Icon size={17}/><span>{label}</span>{href==='/pos'&&<em>V15 POS</em>}{href==='/repairs'&&<em>V15 ERP</em>}</Link>)}</nav></div>)}</div>
+   <div className="v6-nav-scroll">{groups.map(g=><div key={g.label}><div className="nav-section-label">{g.label}</div><nav className="nav suite-nav v6-nav">{g.items.map(([href,label,Icon])=><Link key={href} href={href}><Icon size={17}/><span>{label}</span>{href==='/pos'&&<em>V15 POS</em>}{href==='/repairs'&&<em>V15.1 ERP</em>}</Link>)}</nav></div>)}</div>
    <div className="side-bottom"><div className="user-pill"><div className="avatar">{s?.name?.[0]||'A'}</div><div><b>{s?.name}</b><small>{s?.role==='ADMIN'?'Administrateur':'Technicien'}</small></div></div><form action="/api/auth/logout" method="post"><button className="icon-btn" title="Déconnexion"><LogOut size={17}/></button></form></div>
   </aside>
   <section className="suite-workspace">
