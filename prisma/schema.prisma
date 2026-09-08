@@ -7,20 +7,116 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role { ADMIN TECHNICIAN }
-enum RepairPriority { BASE NORMAL HIGH URGENT }
-enum RepairPhotoKind { BEFORE AFTER }
-enum ContactChannel { SMS WHATSAPP EMAIL PHONE }
-enum DeviceCategory { SMARTPHONE TABLET LAPTOP CONSOLE WATCH OTHER }
-enum RepairStatus { DIAGNOSTIC WAITING_APPROVAL WAITING_PART REPAIRING READY DELIVERED CANCELLED }
-enum QuoteStatus { DRAFT SENT ACCEPTED REFUSED }
-enum PaymentMethod { CASH CARD TRANSFER OTHER }
-enum EventType { CREATED STATUS NOTE PAYMENT QUOTE PART WARRANTY COMMUNICATION CASH }
-enum CashSessionStatus { OPEN CLOSED }
-enum CashMovementType { OPENING SALE REFUND EXPENSE ADJUSTMENT CLOSING }
-enum WarrantyClaimStatus { OPEN DIAGNOSIS APPROVED REJECTED RESOLVED }
-enum CommunicationStatus { DRAFT SENT FAILED }
-enum AuditAction { CREATE UPDATE DELETE LOGIN LOGOUT STATUS_CHANGE PAYMENT PRINT COMMUNICATION CASH_OPEN CASH_CLOSE }
+enum Role {
+  ADMIN
+  TECHNICIAN
+}
+
+enum RepairPriority {
+  BASE
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum RepairPhotoKind {
+  BEFORE
+  AFTER
+}
+
+enum ContactChannel {
+  SMS
+  WHATSAPP
+  EMAIL
+  PHONE
+}
+
+enum DeviceCategory {
+  SMARTPHONE
+  TABLET
+  LAPTOP
+  CONSOLE
+  WATCH
+  OTHER
+}
+
+enum RepairStatus {
+  DIAGNOSTIC
+  WAITING_APPROVAL
+  WAITING_PART
+  REPAIRING
+  READY
+  DELIVERED
+  CANCELLED
+}
+
+enum QuoteStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  REFUSED
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  TRANSFER
+  OTHER
+}
+
+enum EventType {
+  CREATED
+  STATUS
+  NOTE
+  PAYMENT
+  QUOTE
+  PART
+  WARRANTY
+  COMMUNICATION
+  CASH
+}
+
+enum CashSessionStatus {
+  OPEN
+  CLOSED
+}
+
+enum CashMovementType {
+  OPENING
+  SALE
+  REFUND
+  EXPENSE
+  ADJUSTMENT
+  CLOSING
+}
+
+enum WarrantyClaimStatus {
+  OPEN
+  DIAGNOSIS
+  APPROVED
+  REJECTED
+  RESOLVED
+}
+
+enum CommunicationStatus {
+  DRAFT
+  SENT
+  FAILED
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  STATUS_CHANGE
+  PAYMENT
+  PRINT
+  COMMUNICATION
+  CASH_OPEN
+  CASH_CLOSE
+}
 
 model User {
   id String @id @default(cuid())
