@@ -4,7 +4,7 @@ import AppShell from '@/components/AppShell'
 import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { eur,statusLabel,statusClass,dateOnlyFr } from '@/lib/format'
-import { ClipboardList, Search, Plus, List, Columns3, Download, UserRound, Clock3, ChevronRight, FolderOpen, Archive, CalendarDays, CheckCircle2, Wrench, PackageSearch, XCircle, SlidersHorizontal, ExternalLink, TimerReset, UserCheck, CircleDollarSign, Sparkles } from 'lucide-react'
+import { ClipboardList, Search, Plus, List, Columns3, Download, UserRound, Clock3, ChevronRight, FolderOpen, Archive, CalendarDays, CheckCircle2, Wrench, PackageSearch, XCircle, Settings, ExternalLink, TimerReset, UserCheck, CircleDollarSign, Sparkles } from 'lucide-react'
 
 const statusCards=[
  ['ALL','Tous',ClipboardList,'dark'],['DIAGNOSTIC','En diagnostic',Search,'purple'],['WAITING_APPROVAL','En attente accord',Clock3,'amber'],['REPAIRING','En réparation',Wrench,'blue'],['WAITING_PART','Attente de pièces',PackageSearch,'orange'],['READY','Prêt à restituer',CheckCircle2,'green'],['DELIVERED','Restitué',ClipboardList,'mint'],['CANCELLED','Abandonné',XCircle,'red']
@@ -31,9 +31,9 @@ export default async function Repairs({searchParams}:{searchParams:Promise<{q?:s
  const qs=(patch:Record<string,string>)=>{const p=new URLSearchParams();Object.entries({...sp,...patch}).forEach(([k,v])=>{if(v)p.set(k,v)});return `?${p.toString()}`}
  const back=qs({})
  return <AppShell>
-  <div className="v7-page-head compact-head"><div><div className="eyebrow">COMPLETE WORKSHOP · V13</div><h1>Prises en charge</h1><p>Pilotez chaque appareil du dépôt à la restitution, avec une vue atelier temps réel.</p></div><div className="v7-title-actions"><Link className="btn secondary" href="/api/repairs/export"><Download size={16}/> Exporter CSV</Link><Link className="btn v7-primary" href="/repairs/new"><Plus size={17}/> Nouvelle prise en charge</Link></div></div>
+  <div className="v7-page-head compact-head"><div><div className="eyebrow">FUNCTIONAL WORKSHOP · V15.4</div><h1>Prises en charge</h1><p>Pilotez chaque appareil du dépôt à la restitution, avec une vue atelier temps réel.</p></div><div className="v7-title-actions"><Link className="btn secondary" href="/api/repairs/export"><Download size={16}/> Exporter CSV</Link><Link className="btn v7-primary" href="/repairs/new"><Plus size={17}/> Nouvelle prise en charge</Link></div></div>
 
-  <section className="card v7-commandbar"><div className="segmented"><Link className={view==='list'?'active':''} href={qs({view:'list'})}><List size={16}/> Liste</Link><Link className={view==='kanban'?'active':''} href={qs({view:'kanban'})}><Columns3 size={16}/> Kanban</Link></div><div className="v7-command-divider"/><div className="v7-mini-stat"><Sparkles size={15}/><b>{filtered.length}</b><span>dossiers affichés</span></div><div className="toolbar-spacer"/><button className="soft-btn"><SlidersHorizontal size={15}/> Personnaliser les statuts</button></section>
+  <section className="card v7-commandbar"><div className="segmented"><Link className={view==='list'?'active':''} href={qs({view:'list'})}><List size={16}/> Liste</Link><Link className={view==='kanban'?'active':''} href={qs({view:'kanban'})}><Columns3 size={16}/> Kanban</Link></div><div className="v7-command-divider"/><div className="v7-mini-stat"><Sparkles size={15}/><b>{filtered.length}</b><span>dossiers affichés</span></div><div className="toolbar-spacer"/><Link href="/settings" className="soft-btn"><Settings size={15}/> Paramètres atelier</Link></section>
 
   <div className="scope-tabs v7-scope-tabs"><Link className={scope==='active'?'active':''} href={qs({scope:'active',status:'',late:''})}><FolderOpen size={16}/> Actifs</Link><Link className={scope==='archive'?'active':''} href={qs({scope:'archive',status:'',late:''})}><Archive size={16}/> Archives</Link></div>
 
