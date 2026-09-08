@@ -6,7 +6,7 @@ import {Eraser,PenLine} from 'lucide-react'
 export default function SignaturePad(){
  const canvasRef=useRef<HTMLCanvasElement>(null)
  const drawing=useRef(false)
- const [empty,setEmpty]=useState(true)
+ const [signature,setSignature]=useState('')
 
  useEffect(()=>{
   const canvas=canvasRef.current
@@ -34,7 +34,7 @@ export default function SignaturePad(){
   e.currentTarget.setPointerCapture(e.pointerId)
   const p=point(e.nativeEvent);if(!p)return
   const ctx=canvasRef.current?.getContext('2d');if(!ctx)return
-  ctx.beginPath();ctx.moveTo(p.x,p.y);drawing.current=true;setEmpty(false)
+  ctx.beginPath();ctx.moveTo(p.x,p.y);drawing.current=true
  }
  const move=(e:React.PointerEvent<HTMLCanvasElement>)=>{
   if(!drawing.current)return
@@ -42,20 +42,25 @@ export default function SignaturePad(){
   const ctx=canvasRef.current?.getContext('2d');if(!ctx)return
   ctx.lineTo(p.x,p.y);ctx.stroke()
  }
- const end=()=>{drawing.current=false}
+ const end=()=>{
+  if(!drawing.current)return
+  drawing.current=false
+  const canvas=canvasRef.current
+  if(canvas)setSignature(canvas.toDataURL('image/png'))
+ }
  const clear=()=>{
   const canvas=canvasRef.current;const ctx=canvas?.getContext('2d')
   if(!canvas||!ctx)return
   ctx.clearRect(0,0,canvas.width,canvas.height)
-  setEmpty(true)
+  setSignature('')
  }
 
  return <div className="signature-pad">
-  <div className="signature-pad-head"><span><PenLine size={16}/> Signature manuscrite</span><button type="button" className="text-link" onClick={clear} disabled={empty}><Eraser size={14}/> Effacer</button></div>
+  <div className="signature-pad-head"><span><PenLine size={16}/> Signature manuscrite</span><button type="button" className="text-link" onClick={clear} disabled={!signature}><Eraser size={14}/> Effacer</button></div>
   <div className="signature-canvas-wrap">
    <canvas ref={canvasRef} className="signature-canvas" onPointerDown={start} onPointerMove={move} onPointerUp={end} onPointerCancel={end} aria-label="Zone de signature" />
-   {empty&&<div className="signature-placeholder">Signez ici avec votre doigt ou votre stylet</div>}
+   {!signature&&<div className="signature-placeholder">Signez ici avec votre doigt ou votre stylet</div>}
   </div>
-  <input type="hidden" name="signature" value={empty?'':(canvasRef.current?.toDataURL('image/png')||'')} readOnly />
+  <input type="hidden" name="signature" value={signature} readOnly required />
  </div>
 }
