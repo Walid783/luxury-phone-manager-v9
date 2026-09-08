@@ -11,7 +11,7 @@ export default async function AppShell({children}:{children:React.ReactNode}){
  const s=await getSession()
  const groups=[
   {label:'ATELIER',items:[
-   ['/', 'Tableau de bord V14', LayoutDashboard],
+   ['/','Tableau de bord V14', LayoutDashboard],
    ['/frontdesk','Réception express',Sparkles],
    ['/repairs','Prises en charge',ClipboardList],
    ['/checklists','Listes de contrôle',ClipboardCheck],
@@ -53,7 +53,7 @@ export default async function AppShell({children}:{children:React.ReactNode}){
     <form action="/repairs" method="get" className="global-search"><Search size={17}/><input name="q" placeholder="Rechercher ticket, client, appareil, IMEI..."/><span className="kbd"><Command size={12}/> K</span></form>
     <div className="topbar-actions"><div className="today"><CalendarDays size={16}/><span>{today}</span></div><button className="top-icon" title="Notifications"><Bell size={18}/><i/></button><Link className="btn top-create" href="/repairs/new"><Plus size={17}/> Nouvelle prise en charge</Link></div>
    </header>
-   <main className="main suite-main v6-main">{children}</main>
+   <main className="main suite-main v6-main"><style>{`.suite-main .v14-topbar{display:none!important}.suite-main .v14-head{margin-top:0}`}</style>{children}</main>
   </section>
  </div>
 }
