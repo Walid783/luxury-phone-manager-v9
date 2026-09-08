@@ -1,5 +1,6 @@
 import Script from 'next/script'
 import './globals.css'
+import './repair-readability.css'
 
 export const metadata={title:'Luxury Phone Manager V13 — Complete Workshop ERP',description:'Gestion atelier, caisse et impression Luxury Phone'}
 
