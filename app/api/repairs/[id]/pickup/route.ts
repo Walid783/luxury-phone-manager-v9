@@ -83,7 +83,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         },
       })
       return { due, paymentId }
-    })
+    }, { isolationLevel: 'Serializable' })
 
     if (result.paymentId) {
       await audit({
