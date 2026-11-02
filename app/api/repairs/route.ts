@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 import {NextResponse} from 'next/server'
 import {prisma} from '@/lib/prisma'
 import {getSession} from '@/lib/auth'
@@ -30,7 +31,7 @@ export async function POST(req:Request){
  const diagnosticConsent=f.get('diagnosticConsent')==='on',backupConfirmed=f.get('backupConfirmed')==='on',dataAccessConsent=f.get('dataAccessConsent')==='on',quoteRequired=f.get('quoteRequired')==='on'
  const cash=deposit>0&&paymentMethod==='CASH'?await prisma.cashSession.findFirst({where:{status:'OPEN'}}):null
  const r=await prisma.repair.create({data:{
-  clientId:c.id,deviceCategory:categories.has(category)?category as any:'SMARTPHONE',deviceBrand:String(f.get('brand')||''),deviceModel:String(f.get('model')||''),deviceColor:String(f.get('deviceColor')||'')||null,deviceStorage:String(f.get('deviceStorage')||'')||null,imei:String(f.get('imei')||'')||null,issue:String(f.get('issue')||''),diagnostic:String(f.get('diagnosticNote')||'')||null,conditionIn:String(f.get('conditionIn')||'')||null,accessories:String(f.get('accessories')||'')||null,lockCode:String(f.get('lockCode')||'')||null,internalNotes:String(f.get('notes')||'')||null,total,quoteAmount:total,deposit,
+  trackingToken:randomUUID(),clientId:c.id,deviceCategory:categories.has(category)?category as any:'SMARTPHONE',deviceBrand:String(f.get('brand')||''),deviceModel:String(f.get('model')||''),deviceColor:String(f.get('deviceColor')||'')||null,deviceStorage:String(f.get('deviceStorage')||'')||null,imei:String(f.get('imei')||'')||null,issue:String(f.get('issue')||''),diagnostic:String(f.get('diagnosticNote')||'')||null,conditionIn:String(f.get('conditionIn')||'')||null,accessories:String(f.get('accessories')||'')||null,lockCode:String(f.get('lockCode')||'')||null,internalNotes:String(f.get('notes')||'')||null,total,quoteAmount:total,deposit,
   powersOn,moistureSuspected:String(f.get('moistureSuspected')||'no')==='yes',backupConfirmed,diagnosticConsent,dataAccessConsent,notificationChannel:channels.has(channel)?channel as any:'SMS',intakeChecklist:checklist,
   quoteStatus:quoteRequired?'DRAFT':'ACCEPTED',quoteAcceptedAt:quoteRequired?null:new Date(),priority:priorities.has(priority)?priority as any:'NORMAL',assignedToId:assigned||s.id,promisedAt:promised?new Date(promised):null,warrantyDays:Math.max(0,Number(f.get('warrantyDays')||90)),customerSignature:signature||null,signatureAt:signature?new Date():null,
   photos:photos.length?{create:photos.map(dataUrl=>({kind:'BEFORE' as any,dataUrl}))}:undefined,
