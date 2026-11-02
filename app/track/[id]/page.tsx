@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic'
 
 export default async function Track({ params }: { params: Promise<{ id: string }> }) {
   const { id: token } = await params
-  if (!token || token.length < 16 || token.length > 256) notFound()
+  if (!token || token.length > 256) notFound()
 
   // The public route must never resolve a repair by its internal database ID.
   const r = await prisma.repair.findUnique({
