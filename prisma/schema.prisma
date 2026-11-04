@@ -395,3 +395,39 @@ model PosRefund {
   createdAt DateTime @default(now())
   @@index([saleId, createdAt])
 }
+
+
+enum BuybackStatus {
+  ESTIMATE
+  OFFERED
+  ACCEPTED
+  RECEIVED
+  REFUSED
+  RESOLD
+}
+
+model Buyback {
+  id String @id @default(cuid())
+  clientName String
+  clientPhone String
+  clientEmail String?
+  brand String @default("Apple")
+  model String
+  storage String?
+  imei String?
+  conditionNotes String? @db.Text
+  batteryHealth Int?
+  screenTested Boolean @default(false)
+  faceIdTested Boolean @default(false)
+  icloudCleared Boolean @default(false)
+  photoUrls String? @db.Text
+  offerPrice Decimal @db.Decimal(10,2)
+  repairCosts Decimal @default(0) @db.Decimal(10,2)
+  expectedSalePrice Decimal? @db.Decimal(10,2)
+  actualSalePrice Decimal? @db.Decimal(10,2)
+  status BuybackStatus @default(ESTIMATE)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([status, createdAt])
+  @@index([clientPhone])
+}
