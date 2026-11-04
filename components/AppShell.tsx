@@ -23,6 +23,7 @@ export default async function AppShell({children}:{children:React.ReactNode}){
   ]},
   {label:'RELATION CLIENT',items:[
    ['/clients','Clients',Users],
+   ['/buybacks','Reprises téléphones',HandCoins],
    ['/warranties','SAV & Garanties',ShieldCheck],
    ['/communications','Communications',MessageSquareText],
   ]},
