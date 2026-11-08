@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="Luxury Phone Manager">
+ <defs>
+  <linearGradient id="b" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#24113a"/><stop offset="1" stop-color="#080711"/></linearGradient>
+  <linearGradient id="v" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#dc97ff"/><stop offset="1" stop-color="#7533ca"/></linearGradient>
+ </defs>
+ <rect width="512" height="512" rx="110" fill="url(#b)"/>
+ <rect x="26" y="26" width="460" height="460" rx="93" fill="none" stroke="#8f50ce" stroke-width="7"/>
+ <path d="M154 172l40-31 62 41 62-41 40 31-16 66H170z" fill="#d9ae66"/>
+ <path d="M176 267h160v27H204v101h132v27H176z" fill="url(#v)"/>
+ <path d="M255 292h29v100h-29z" fill="url(#v)"/>
+ <text x="256" y="458" text-anchor="middle" font-family="Arial,sans-serif" font-size="22" letter-spacing="7" fill="#e9d3fa">MANAGER</text>
+</svg>
