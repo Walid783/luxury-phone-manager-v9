@@ -1,0 +1,61 @@
+/* Luxury Phone Manager — Royal Violet preview. Scoped to ERP UI; print and invoice surfaces remain untouched. */
+:root {
+ --lp-bg:#080710;--lp-surface:#14101f;--lp-surface-soft:#1b1428;--lp-border:#3f3156;--lp-text:#f8f5ff;--lp-muted:#b7adc8;--lp-black:#080710;--lp-black2:#0d0a16;
+ --lp-red:#8b3fe3;--lp-red2:#bb71ff;--lp-red-dark:#511e83;--purple:#b86bff;--gold:#d6a952;--gold2:#f5d18c;
+}
+html,body{background:#080710!important;color:#f8f5ff!important}
+.shell,.suite-shell,.v16-shell{background:#080710!important;color:#f8f5ff!important}
+.v16-shell .v6-side,.suite-side,.side{background:linear-gradient(160deg,#0c0816 0%,#110b1e 48%,#080710 100%)!important;border-right:1px solid #3c2b52!important;box-shadow:10px 0 50px #0008!important}
+.v16-shell .v6-brand,.brand,.suite-brand{color:#fff!important}
+.v16-shell .v6-brand span,.brand span{color:#f0c77f!important}
+.v16-shell .v6-brand .brand-mark,.brand-mark{background:linear-gradient(145deg,#f7d997,#ae792c)!important;color:#1b1023!important;box-shadow:0 0 24px #d4a55444!important}
+.v16-shell .workspace-card,.workspace-card{background:linear-gradient(145deg,#21132c,#120e1e)!important;border:1px solid #553768!important;color:#fff!important}
+.v16-shell .workspace-avatar,.workspace-avatar{background:#5e287d!important;color:#fff!important}
+.v16-shell .workspace-card small,.workspace-card small{color:#a99bb8!important}
+.v16-shell .v6-nav a,.v6-nav a,.nav a{color:#cfc5da!important;border:1px solid transparent!important}
+.v16-shell .v6-nav a svg,.v6-nav a svg{color:#bb7aff!important}
+.v16-shell .v6-nav a:hover,.v6-nav a:hover,.nav a:hover{background:linear-gradient(100deg,#542081,#281438)!important;border-color:#7944ab!important;color:#fff!important;box-shadow:0 0 16px #a950fc22!important}
+.v16-shell .v6-nav a:focus-visible{outline-color:#c38aff!important}
+.v16-shell .nav-section-label{color:#867994!important}
+.v16-shell .v6-nav a em{color:#e2b2ff!important;background:#45235f!important;border-color:#72429a!important}
+.v16-shell .side-bottom{border-top:1px solid #382c49!important}
+.v16-shell .user-pill,.v16-shell .icon-btn{background:#181122!important;color:#f1e7ff!important;border-color:#49345b!important}
+.v16-shell .avatar{background:#45245e!important;color:#e9bdff!important}
+.v16-shell .v6-topbar,.suite-topbar{background:#0e0b18!important;border-bottom:1px solid #352744!important}
+.v16-shell .global-search,.v16-shell .today,.v16-shell .top-icon{background:#191323!important;color:#f4edff!important;border-color:#443353!important}
+.v16-shell .global-search input{background:transparent!important;color:#fff!important}
+.v16-shell .global-search input::placeholder{color:#9388a5!important}
+.v16-shell .top-icon i{background:#b44dff!important}
+.v16-shell .top-create,.btn,.dash15 .hero-btn.primary{background:linear-gradient(115deg,#8228d6,#b94bf5)!important;color:#fff!important;border-color:#bd75fc!important;box-shadow:0 7px 25px #922df74a!important}
+.v16-shell .repair-context-dock{background:#100b1c!important;border-color:#362446!important}
+.v16-shell .repair-context-title{color:#f3eaff!important}
+.v16-shell .repair-context-title small{color:#af9fbd!important}
+.v16-shell .v6-main,.suite-main,.main{background:radial-gradient(ellipse at 85% -10%,#321347 0%,#110b1b 36%,#080710 75%)!important;color:#faf7ff!important}
+.card,.kpi-card,.info-card,.money-card,.v7-commandbar,.v7-filter-card,.v7-board-card,.dash15 .card,.dash15 .kpi,.repair15 .card,.repair15 .summary-card{
+ background:linear-gradient(145deg,rgba(31,22,44,.98),rgba(15,12,26,.98))!important;
+ border:1px solid #513768!important;border-radius:18px!important;
+ box-shadow:0 12px 34px #0007,0 0 28px #7a31b111!important;color:#f7f1ff!important
+}
+.card h1,.card h2,.card h3,.card b,.card strong,.hero-head h1{color:#fff!important}
+.card p,.section-title p,.muted,.kpi-card small,.info-card small{color:#b7a9c5!important}
+.kpi-icon,.dash15 .kpi-icon{background:linear-gradient(135deg,#542575,#2d1648)!important;color:#d699ff!important}
+.eyebrow,.text-link,.row-link{color:#d28bff!important}
+input,select,textarea,.field input,.field select,.field textarea{background:#160f21!important;border-color:#4a385c!important;color:#fff!important}
+input:focus,select:focus,textarea:focus{border-color:#bd74ff!important;box-shadow:0 0 0 3px #b64cff33!important}
+.btn.secondary,.soft-btn{background:#241b30!important;border-color:#543d67!important;color:#f1eaff!important}
+table{background:#151020!important;color:#f8f4ff!important}
+th{background:#20162d!important;color:#c3b4d2!important;border-bottom-color:#483355!important}
+td{color:#f1eafa!important;border-bottom-color:#3c2b4b!important}
+tbody tr:hover{background:#281937!important}
+.badge.purple{background:#39204e!important;border-color:#73479b!important;color:#dcb4ff!important}
+.dash15 .hero,.repair15 .hero{background:linear-gradient(120deg,#100a1d 0%,#231233 55%,#4b1f69 100%)!important;border-color:#654082!important}
+@media (prefers-reduced-motion:no-preference){
+ .card,.kpi-card,.btn,.v6-nav a{transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease!important}
+ .card:hover,.kpi-card:hover{border-color:#8652ad!important;box-shadow:0 16px 42px #0008,0 0 24px #7e30b02a!important}
+}
+@media(max-width:800px){.v16-shell .v6-main,.suite-main,.main{background:#0b0813!important}}
+/* Avoid overriding paper invoices, printable receipts and labels. */
+@media print{
+ html,body{background:#fff!important;color:#111!important}
+ .invoice-sheet,.invoice-sheet *{background:#fff!important;color:#111!important;box-shadow:none!important}
+}
