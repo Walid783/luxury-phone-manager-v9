@@ -2,6 +2,7 @@ import Script from 'next/script'
 import './globals.css'
 import './repair-readability.css'
 import './theme-v151.css'
+import './theme-royal-violet.css'
 
 export const metadata={title:'Luxury Phone Manager V15.1 — Premium Workshop ERP',description:'Gestion atelier, caisse et réparation Luxury Phone'}
 
