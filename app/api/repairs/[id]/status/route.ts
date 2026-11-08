@@ -29,8 +29,11 @@ export async function POST(req:Request,{params}:{params:Promise<{id:string}>}){
   if(!paidOk||!invoiceOk)return new NextResponse('Facture et règlement complet obligatoires',{status:409})
  }
  const warrantyDays=Number(f.get('warrantyDays')||old.warrantyDays||90);const now=new Date();const warrantyUntil=status==='DELIVERED'?new Date(now.getTime()+warrantyDays*86400000):old.warrantyUntil
+ const totalRaw=f.get('total')
+ const total=totalRaw===null?Number(old.total):Number(totalRaw)
+ if(!Number.isFinite(total)||total<0||!/^\d+(?:\.\d{1,2})?$/.test(String(totalRaw??old.total)))return new NextResponse('Montant invalide',{status:400})
  const promisedRaw=String(f.get('promisedAt')||'')
- await prisma.repair.update({where:{id},data:{status:status as any,total:Number(f.get('total')||0),diagnostic:String(f.get('diagnostic')||'')||null,workDone:String(f.get('workDone')||'')||null,internalNotes:String(f.get('internalNotes')||'')||null,publicNotes:String(f.get('publicNotes')||'')||null,warrantyDays,promisedAt:promisedRaw?new Date(promisedRaw):null,deliveredAt:status==='DELIVERED'?(old.deliveredAt||now):old.deliveredAt,warrantyUntil,events:status!==old.status?{create:{type:'STATUS',title:`Statut : ${status}`,detail:String(f.get('publicNotes')||'')||null,userId:s.id}}:undefined}})
+ await prisma.repair.update({where:{id},data:{status:status as any,total,diagnostic:String(f.get('diagnostic')||'')||null,workDone:String(f.get('workDone')||'')||null,internalNotes:String(f.get('internalNotes')||'')||null,publicNotes:String(f.get('publicNotes')||'')||null,warrantyDays,promisedAt:promisedRaw?new Date(promisedRaw):null,deliveredAt:status==='DELIVERED'?(old.deliveredAt||now):old.deliveredAt,warrantyUntil,events:status!==old.status?{create:{type:'STATUS',title:`Statut : ${status}`,detail:String(f.get('publicNotes')||'')||null,userId:s.id}}:undefined}})
  if(status!==old.status)await audit({userId:s.id,action:'STATUS_CHANGE',entity:'Repair',entityId:id,detail:`${old.status} → ${status}`})
  return NextResponse.redirect(new URL(`/repairs/${id}`,req.url),303)
 }
