@@ -21,7 +21,11 @@ export async function POST(req:Request){
   if(!c)c=await prisma.client.create({data:{...clientData,phone}})
   else c=await prisma.client.update({where:{id:c.id},data:{...clientData,email:email||c.email}})
  }
- const total=Math.max(0,Number(f.get('total')||0)),deposit=Math.max(0,Math.min(Number(f.get('deposit')||0),total||Number(f.get('deposit')||0)))
+ const totalRaw=Number(f.get('total')||0),depositRaw=Number(f.get('deposit')||0)
+ if(!Number.isFinite(totalRaw)||!Number.isFinite(depositRaw)||totalRaw<0||depositRaw<0||depositRaw>totalRaw||Math.round(totalRaw*100)!==totalRaw*100||Math.round(depositRaw*100)!==depositRaw*100){
+  return new NextResponse('Montants invalides : total et acompte doivent être positifs, avec deux décimales maximum, et acompte <= total',{status:400})
+ }
+ const total=totalRaw,deposit=depositRaw
  const priority=String(f.get('priority')||'NORMAL'),paymentMethod=String(f.get('paymentMethod')||'CARD'),category=String(f.get('deviceCategory')||'SMARTPHONE'),channel=String(f.get('notificationChannel')||'SMS')
  const assigned=String(f.get('assignedToId')||'').trim(),promised=String(f.get('promisedAt')||'').trim(),signature=String(f.get('signature')||'').trim()
  let photos:string[]=[];try{const parsed=JSON.parse(String(f.get('photoData')||'[]'));if(Array.isArray(parsed))photos=parsed.filter(x=>typeof x==='string'&&x.startsWith('data:image/')).slice(0,5)}catch{}
