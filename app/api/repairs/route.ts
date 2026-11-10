@@ -22,7 +22,7 @@ export async function POST(req:Request){
   else c=await prisma.client.update({where:{id:c.id},data:{...clientData,email:email||c.email}})
  }
  const totalRaw=Number(f.get('total')||0),depositRaw=Number(f.get('deposit')||0)
- if(!Number.isFinite(totalRaw)||!Number.isFinite(depositRaw)||totalRaw<0||depositRaw<0||depositRaw>totalRaw||Math.round(totalRaw*100)!==totalRaw*100||Math.round(depositRaw*100)!==depositRaw*100){
+ if(!Number.isFinite(totalRaw)||!Number.isFinite(depositRaw)||totalRaw<0||depositRaw<0||depositRaw>totalRaw||Math.abs(Math.round(totalRaw*100)-totalRaw*100)>1e-7||Math.abs(Math.round(depositRaw*100)-depositRaw*100)>1e-7){
   return new NextResponse('Montants invalides : total et acompte doivent être positifs, avec deux décimales maximum, et acompte <= total',{status:400})
  }
  const total=totalRaw,deposit=depositRaw
